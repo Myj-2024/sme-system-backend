@@ -3,33 +3,41 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
+        <artifactId>gh-sme-sys</artifactId>
         <groupId>com.sme</groupId>
-        <artifactId>gh-sme</artifactId>
         <version>1.0.0</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>gh-sme-pojo</artifactId>
-    <name>gh-sme-pojo</name>
+    <artifactId>sme-pojo</artifactId>
     <description>数据模型模块（Entity/DTO/VO）</description>
 
     <dependencies>
-        <!-- 核心依赖：common模块 -->
+        <!-- Lombok（模型必备） -->
         <dependency>
-            <groupId>com.sme</groupId>
-            <artifactId>gh-sme-common</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
-        <!-- JSR310日期类型（LocalDateTime，Java17推荐） -->
+
+        <!-- 日期序列化（适配Java8+时间类型） -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
-        <!-- Spring Data JDBC注解（仅编译时用，运行时由server提供） -->
+
+        <!-- JDBC（仅编译时依赖） -->
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jdbc</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sme</groupId>
+            <artifactId>sme-common</artifactId>
         </dependency>
     </dependencies>
 </project>

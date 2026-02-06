@@ -11,9 +11,6 @@
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/sem-pojo/pom.xml" />
-        <option value="$PROJECT_DIR$/sme-common/pom.xml" />
-        <option value="$PROJECT_DIR$/sme-pojo/pom.xml" />
-        <option value="$PROJECT_DIR$/sme-server/pom.xml" />
       </set>
     </option>
   </component>

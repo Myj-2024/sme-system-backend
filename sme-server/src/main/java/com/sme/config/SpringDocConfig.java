@@ -61,11 +61,11 @@ public class SpringDocConfig {
     private List<Server> getServers() {
         // 开发环境
         Server devServer = new Server()
-                .url("http://localhost:8080/sme") // 注意：包含项目context-path=/sme，否则接口调试会404
+                .url("http://localhost:8080/") // 注意：包含项目context-path=/sme，否则接口调试会404
                 .description("开发环境（本地）");
         // 测试环境
         Server testServer = new Server()
-                .url("https://test.sme.com/sme")
+                .url("https://test.sme.com/")
                 .description("测试环境（远程）");
         // 返回服务器列表
         return List.of(devServer, testServer);
@@ -77,6 +77,6 @@ public class SpringDocConfig {
     private ExternalDocumentation getExternalDocs() {
         return new ExternalDocumentation()
                 .description("广河中小微企业服务系统-数据库设计文档")
-                .url("http://localhost:8080/sme/readme.html"); // 包含context-path
+                .url("http://localhost:8080/readme.html"); // 包含context-path
     }
 }

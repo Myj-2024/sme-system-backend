@@ -2,14 +2,14 @@
 server:
   port: 8080
   servlet:
-    context-path: /sme # 项目根路径
+    context-path: / # 项目根路径
   tomcat:
     uri-encoding: UTF-8 # Java17中文乱码处理
 
 # Spring核心配置
 spring:
   application:
-    name: gh-sme-service
+    name: gh-sme-sys
   # 数据源配置（MySQL8.0+，Java17适配）
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -19,11 +19,11 @@ spring:
     hikari:
       maximum-pool-size: 20 # 连接池大小
       minimum-idle: 5
-  # 热部署配置
-  devtools:
-    restart:
-      enabled: true
-      additional-paths: src/main/java
+#  # 热部署配置
+#  devtools:
+#    restart:
+#      enabled: true
+#      additional-paths: src/main/java
   # Spring Data JDBC配置
   data:
     jdbc:
