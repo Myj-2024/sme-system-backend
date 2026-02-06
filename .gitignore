@@ -1,39 +1,65 @@
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-.kotlin
+# ===================== 核心：忽略编译/构建目录（适配多模块） =====================
+# 忽略所有层级的target目录（覆盖sme-common/target、sme-pojo/target等）
+**/target/
+# 忽略其他构建目录（NetBeans/Gradle）
+**/build/
+**/dist/
+**/nbdist/
 
-### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
+# 保留maven wrapper jar（避免误忽略）
+!.mvn/wrapper/maven-wrapper.jar
+
+# ===================== 开发工具配置（适配你的IDEA环境） =====================
+# IntelliJ IDEA 全局配置
+.idea/
+# IDEA模块配置（匹配.idea/modules.xml、.idea/jarRepositories.xml等）
+.idea/*.xml
 .idea/libraries/
+# IDEA项目文件
 *.iws
 *.iml
 *.ipr
+# IDEA编译输出
+out/
 
-### Eclipse ###
+# Eclipse（备用，防止多人开发）
 .apt_generated
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
 .sts4-cache
+bin/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
+# VS Code
 .vscode/
 
-### Mac OS ###
+# ===================== 语言/框架专属 =====================
+# Kotlin编译文件
+.kotlin/
+
+# Java编译产物
+**/classes/
+**/generated/
+**/generated-sources/
+
+# ===================== 系统/临时文件 =====================
+# Mac OS
 .DS_Store
+# 临时/缓存文件
+*.tmp
+*.bak
+*.swp
+*.cache
+logs/
+*.log
+
+# ===================== 项目专属（可选，按需添加） =====================
+# 忽略Spring Boot打包产物
+*.jar
+*.war
+*.ear
+# 忽略敏感配置文件（如有）
+# application-dev.yml
+# application-prod.yml
