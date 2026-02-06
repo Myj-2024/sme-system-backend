@@ -1,0 +1,1249 @@
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>广河县中小微企业服务系统 - 数据库设计文档</title>
+		<style>
+			:root {
+				--brand-color: #42b883;
+				--text-color: #2c3e50;
+				--border-color: #eaecef;
+				--code-bg: #f6f8fa;
+				--sidebar-width: 280px;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				font-family:
+					-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+					'Helvetica Neue', Arial, sans-serif;
+				margin: 0;
+				color: var(--text-color);
+				line-height: 1.6;
+				background-color: #fff;
+			}
+			/* 侧边栏 */
+			#sidebar {
+				position: fixed;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				width: var(--sidebar-width);
+				padding: 0 1rem;
+				border-right: 1px solid var(--border-color);
+				overflow-y: auto;
+				background-color: #fff;
+				margin: 0;
+			}
+			#sidebar h2 {
+				font-size: 1.1rem;
+				font-weight: 700;
+				margin-bottom: 1rem;
+				color: #1f2f3d;
+			}
+			#sidebar ul {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+			}
+			#sidebar li {
+				margin-bottom: 0.5rem;
+			}
+			#sidebar a {
+				text-decoration: none;
+				color: #3a5169;
+				font-size: 0.9rem;
+				display: block;
+				padding: 0.3rem 0.5rem;
+				border-radius: 4px;
+			}
+			#sidebar a:hover {
+				color: var(--brand-color);
+				background-color: #f9f9f9;
+			}
+			#sidebar .sub-item {
+				padding-left: 1.2rem;
+				font-size: 0.85rem;
+				color: #666;
+			}
+
+			/* 内容区 */
+			#main {
+				margin-left: var(--sidebar-width);
+				padding: 2rem 4rem;
+				max-width: 1560px;
+			}
+			h1 {
+				font-size: 1.7rem;
+				border-bottom: 1px solid var(--border-color);
+				padding-bottom: 1rem;
+				margin-top: 0;
+			}
+			h2 {
+				font-size: 1.55rem;
+				border-bottom: 1px solid var(--border-color);
+				padding-bottom: 0.5rem;
+				margin-top: 3rem;
+				color: #2c3e50;
+			}
+			h3 {
+				font-size: 1.35rem;
+				margin-top: 2rem;
+				color: var(--brand-color);
+			}
+			h4 {
+				font-size: 1.1rem;
+				margin-top: 1.5rem;
+				padding-left: 0.5rem;
+				border-left: 4px solid var(--brand-color);
+				background: #f0f9eb;
+				padding-top: 5px;
+				padding-bottom: 5px;
+			}
+
+			/* 表格样式 */
+			.table-wrapper {
+				overflow-x: auto;
+				margin: 1rem 0;
+				box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+				border-radius: 4px;
+			}
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 0.85rem;
+				min-width: 800px;
+			}
+			th,
+			td {
+				border: 1px solid var(--border-color);
+				padding: 12px;
+				text-align: left;
+			}
+			th {
+				background-color: #f8f9fa;
+				font-weight: 600;
+				color: #909399;
+			}
+			tr:hover {
+				background-color: #f5f7fa;
+			}
+
+			/* 代码块 */
+			pre {
+				background-color: var(--code-bg);
+				padding: 1.2rem;
+				border-radius: 6px;
+				overflow-x: auto;
+				font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+				font-size: 0.85rem;
+				border: 1px solid #e2e4e7;
+				line-height: 1.5;
+				color: #476582;
+				margin: 1rem 0;
+			}
+			.sql-keyword {
+				color: #d73a49;
+				font-weight: bold;
+			}
+			.sql-comment {
+				color: #6a737d;
+				font-style: italic;
+			}
+			.sql-string {
+				color: #005cc5;
+			}
+
+			@media (max-width: 1000px) {
+				#sidebar {
+					display: none;
+				}
+				#main {
+					margin-left: 0;
+					padding: 1.5rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<nav id="sidebar">
+			<h2>文档大纲</h2>
+			<ul>
+				<li><a href="#part1">一、系统基础表</a></li>
+				<li><a href="#t1" class="sub-item">1. sys_user 用户表</a></li>
+				<li><a href="#t2" class="sub-item">2. sys_dept 部门表</a></li>
+				<li><a href="#t3" class="sub-item">3. sys_dict 字典主表</a></li>
+				<li>
+					<a href="#t4" class="sub-item">4. sys_dict_item 字典项表</a>
+				</li>
+				<li><a href="#part2">二、核心业务表</a></li>
+				<li>
+					<a href="#t5" class="sub-item">5. sme_enterprise 企业表</a>
+				</li>
+				<li>
+					<a href="#t6" class="sub-item"
+						>6. sme_package_service 包抓联</a
+					>
+				</li>
+				<li><a href="#part3">三、内容发布表</a></li>
+				<li><a href="#t7" class="sub-item">7. sme_policy 政策表</a></li>
+				<li><a href="#t8" class="sub-item">8. sme_notice 通知表</a></li>
+				<li><a href="#part4">四、建库语句</a></li>
+				<li><a href="#part5">五、完整建表语句 (SQL)</a></li>
+				<li><a href="#part6">六、模拟数据 (全量)</a></li>
+				<li><a href="#part7">七、使用说明与查询</a></li>
+			</ul>
+		</nav>
+
+		<div id="main">
+			<h1>数据库设计文档</h1>
+
+			<h2 id="part1">一、系统基础表（权限 / 基础配置）</h2>
+
+			<h4 id="t1">1. sys_user（用户表）</h4>
+			<div class="table-wrapper">
+				<table>
+					<thead>
+						<tr>
+							<th>字段名</th>
+							<th>类型 / 说明</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>id</td>
+							<td>主键（自增 / 雪花 ID）</td>
+							<td>唯一标识</td>
+						</tr>
+						<tr>
+							<td>username</td>
+							<td>varchar (50)，非空，唯一</td>
+							<td>用户账号（登录用）</td>
+						</tr>
+						<tr>
+							<td>password</td>
+							<td>varchar (100)，非空</td>
+							<td>密码（BCrypt 加密存储）</td>
+						</tr>
+						<tr>
+							<td>real_name</td>
+							<td>varchar (50)，非空</td>
+							<td>真实姓名</td>
+						</tr>
+						<tr>
+							<td>phone</td>
+							<td>varchar(20)</td>
+							<td>手机号（可做唯一校验）</td>
+						</tr>
+						<tr>
+							<td>dept_id</td>
+							<td>bigint</td>
+							<td>所属部门 ID，关联 sys_dept 表</td>
+						</tr>
+						<tr>
+							<td>role_id</td>
+							<td>bigint</td>
+							<td>
+								角色 ID（关联角色表，文档未细化角色表，可扩展
+								sys_role）
+							</td>
+						</tr>
+						<tr>
+							<td>status</td>
+							<td>tinyint，非空</td>
+							<td>状态：0 禁用 / 1 启用</td>
+						</tr>
+						<tr>
+							<td>create_time</td>
+							<td>datetime，非空</td>
+							<td>创建时间</td>
+						</tr>
+						<tr>
+							<td>update_time</td>
+							<td>datetime</td>
+							<td>更新时间</td>
+						</tr>
+						<tr>
+							<td>del_flag</td>
+							<td>tinyint，默认 0</td>
+							<td>逻辑删除：0 未删 / 1 已删</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<h4 id="t2">2. sys_dept（部门表）</h4>
+			<div class="table-wrapper">
+				<table>
+					<thead>
+						<tr>
+							<th>字段名</th>
+							<th>类型 / 说明</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>id</td>
+							<td>主键</td>
+							<td>唯一标识</td>
+						</tr>
+						<tr>
+							<td>dept_name</td>
+							<td>varchar (50)，非空</td>
+							<td>部门名称</td>
+						</tr>
+						<tr>
+							<td>dept_code</td>
+							<td>varchar (50)，非空，唯一</td>
+							<td>部门编码</td>
+						</tr>
+						<tr>
+							<td>parent_id</td>
+							<td>bigint，默认 0</td>
+							<td>上级部门 ID（0 为顶级）</td>
+						</tr>
+						<tr>
+							<td>leader</td>
+							<td>varchar(50)</td>
+							<td>部门负责人</td>
+						</tr>
+						<tr>
+							<td>phone</td>
+							<td>varchar(20)</td>
+							<td>部门联系电话</td>
+						</tr>
+						<tr>
+							<td>status</td>
+							<td>tinyint，非空</td>
+							<td>状态：0 禁用 / 1 启用</td>
+						</tr>
+						<tr>
+							<td>create_time</td>
+							<td>datetime，非空</td>
+							<td>创建时间</td>
+						</tr>
+						<tr>
+							<td>update_time</td>
+							<td>datetime</td>
+							<td>更新时间</td>
+						</tr>
+						<tr>
+							<td>del_flag</td>
+							<td>tinyint，默认 0</td>
+							<td>逻辑删除</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<h4 id="t3">3. sys_dict（字典主表）</h4>
+			<div class="table-wrapper">
+				<table>
+					<thead>
+						<tr>
+							<th>字段名</th>
+							<th>类型 / 说明</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>id</td>
+							<td>主键</td>
+							<td>唯一标识</td>
+						</tr>
+						<tr>
+							<td>dict_code</td>
+							<td>varchar (50)，非空，唯一</td>
+							<td>字典编码（如 enterprise_type）</td>
+						</tr>
+						<tr>
+							<td>dict_name</td>
+							<td>varchar (50)，非空</td>
+							<td>字典名称（如企业类型）</td>
+						</tr>
+						<tr>
+							<td>sort</td>
+							<td>int，默认 0</td>
+							<td>排序</td>
+						</tr>
+						<tr>
+							<td>status</td>
+							<td>tinyint，非空</td>
+							<td>状态：0 禁用 / 1 启用</td>
+						</tr>
+						<tr>
+							<td>create_time</td>
+							<td>datetime，非空</td>
+							<td>创建时间</td>
+						</tr>
+						<tr>
+							<td>update_time</td>
+							<td>datetime</td>
+							<td>更新时间</td>
+						</tr>
+						<tr>
+							<td>del_flag</td>
+							<td>tinyint，默认 0</td>
+							<td>逻辑删除</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<h4 id="t4">4. sys_dict_item（字典项表）</h4>
+			<div class="table-wrapper">
+				<table>
+					<thead>
+						<tr>
+							<th>字段名</th>
+							<th>类型 / 说明</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>id</td>
+							<td>主键</td>
+							<td>唯一标识</td>
+						</tr>
+						<tr>
+							<td>dict_id</td>
+							<td>bigint，非空</td>
+							<td>关联字典主表 sys_dict.id</td>
+						</tr>
+						<tr>
+							<td>item_code</td>
+							<td>varchar (50)，非空</td>
+							<td>项编码（如 industry）</td>
+						</tr>
+						<tr>
+							<td>item_name</td>
+							<td>varchar (50)，非空</td>
+							<td>项名称（如工业）</td>
+						</tr>
+						<tr>
+							<td>sort</td>
+							<td>int，默认 0</td>
+							<td>排序</td>
+						</tr>
+						<tr>
+							<td>status</td>
+							<td>tinyint，非空</td>
+							<td>状态：0 禁用 / 1 启用</td>
+						</tr>
+						<tr>
+							<td>create_time</td>
+							<td>datetime，非空</td>
+							<td>创建时间</td>
+						</tr>
+						<tr>
+							<td>update_time</td>
+							<td>datetime</td>
+							<td>更新时间</td>
+						</tr>
+						<tr>
+							<td>del_flag</td>
+							<td>tinyint，默认 0</td>
+							<td>逻辑删除</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<h2 id="part2">二、核心业务表（企业 / 包抓联服务）</h2>
+
+			<h4 id="t5">5. sme_enterprise（企业表）</h4>
+			<div class="table-wrapper">
+				<table>
+					<thead>
+						<tr>
+							<th>字段名</th>
+							<th>类型 / 说明</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>id</td>
+							<td>主键</td>
+							<td>唯一标识</td>
+						</tr>
+						<tr>
+							<td>enterprise_name</td>
+							<td>varchar (100)，非空，唯一</td>
+							<td>企业名称</td>
+						</tr>
+						<tr>
+							<td>credit_code</td>
+							<td>varchar (20)，非空，唯一</td>
+							<td>统一社会信用代码</td>
+						</tr>
+						<tr>
+							<td>enterprise_type</td>
+							<td>bigint</td>
+							<td>
+								企业类型（关联 sys_dict_item，字典编码
+								enterprise_type）
+							</td>
+						</tr>
+						<tr>
+							<td>business_addr</td>
+							<td>varchar(255)</td>
+							<td>经营地址</td>
+						</tr>
+						<tr>
+							<td>legal_person</td>
+							<td>varchar(50)</td>
+							<td>法定代表人</td>
+						</tr>
+						<tr>
+							<td>phone</td>
+							<td>varchar(20)</td>
+							<td>企业联系电话</td>
+						</tr>
+						<tr>
+							<td>reg_capital</td>
+							<td>decimal(18,2)</td>
+							<td>注册资本（万元）</td>
+						</tr>
+						<tr>
+							<td>establish_time</td>
+							<td>date</td>
+							<td>成立时间</td>
+						</tr>
+						<tr>
+							<td>town_id</td>
+							<td>bigint</td>
+							<td>
+								所属乡镇（关联 sys_dict_item，字典编码 town）
+							</td>
+						</tr>
+						<tr>
+							<td>industry_id</td>
+							<td>bigint</td>
+							<td>
+								所属行业（关联 sys_dict_item，字典编码
+								industry）
+							</td>
+						</tr>
+						<tr>
+							<td>business_status</td>
+							<td>bigint</td>
+							<td>
+								经营状态（关联 sys_dict_item，字典编码
+								business_status）
+							</td>
+						</tr>
+						<tr>
+							<td>create_time</td>
+							<td>datetime，非空</td>
+							<td>创建时间</td>
+						</tr>
+						<tr>
+							<td>update_time</td>
+							<td>datetime</td>
+							<td>更新时间</td>
+						</tr>
+						<tr>
+							<td>del_flag</td>
+							<td>tinyint，默认 0</td>
+							<td>逻辑删除</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<h4 id="t6">6. sme_package_service（包抓联服务表）</h4>
+			<div class="table-wrapper">
+				<table>
+					<thead>
+						<tr>
+							<th>序号</th>
+							<th>字段名</th>
+							<th>数据类型</th>
+							<th>主键/索引</th>
+							<th>非空</th>
+							<th>默认值</th>
+							<th>关联关系 & 字典编码</th>
+							<th>对应 Excel 字段</th>
+							<th>字段注释</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>1</td>
+							<td>id</td>
+							<td>BIGINT UNSIGNED</td>
+							<td>主键(自增)</td>
+							<td>✅</td>
+							<td>自增</td>
+							<td>-</td>
+							<td>序号</td>
+							<td>主键 ID（系统唯一标识）</td>
+						</tr>
+						<tr>
+							<td>2</td>
+							<td>package_no</td>
+							<td>VARCHAR(50)</td>
+							<td>唯一索引</td>
+							<td>❌</td>
+							<td>''</td>
+							<td>-</td>
+							<td>-</td>
+							<td>包抓联编号（GH_BZL_202502001）</td>
+						</tr>
+						<tr>
+							<td>3</td>
+							<td>dept_id</td>
+							<td>BIGINT UNSIGNED</td>
+							<td>普通索引</td>
+							<td>✅</td>
+							<td>-</td>
+							<td>关联 sys_dept.id</td>
+							<td>包联部门</td>
+							<td>包联责任部门 ID</td>
+						</tr>
+						<tr>
+							<td>4</td>
+							<td>leader_item_code</td>
+							<td>VARCHAR(50)</td>
+							<td>普通索引</td>
+							<td>✅</td>
+							<td>-</td>
+							<td>字典：package_leader</td>
+							<td>包联领导</td>
+							<td>包联领导编码</td>
+						</tr>
+						<tr>
+							<td>5</td>
+							<td>enterprise_id</td>
+							<td>BIGINT UNSIGNED</td>
+							<td>普通索引</td>
+							<td>✅</td>
+							<td>-</td>
+							<td>关联 sme_enterprise.id</td>
+							<td>包联企业</td>
+							<td>被包联企业 ID</td>
+						</tr>
+						<tr>
+							<td>6</td>
+							<td>enterprise_problem</td>
+							<td>TEXT</td>
+							<td>-</td>
+							<td>✅</td>
+							<td>-</td>
+							<td>-</td>
+							<td>企业反映问题</td>
+							<td>问题描述（支持长文本）</td>
+						</tr>
+						<tr>
+							<td>7</td>
+							<td>problem_receive_time</td>
+							<td>DATETIME</td>
+							<td>普通索引</td>
+							<td>✅</td>
+							<td>-</td>
+							<td>-</td>
+							<td>问题接收时间</td>
+							<td>政务部门接收时间</td>
+						</tr>
+						<tr>
+							<td>8</td>
+							<td>problem_type</td>
+							<td>VARCHAR(50)</td>
+							<td>普通索引</td>
+							<td>✅</td>
+							<td>-</td>
+							<td>字典：package_problem_type</td>
+							<td>问题类型</td>
+							<td>18类分类选择</td>
+						</tr>
+						<tr>
+							<td>9</td>
+							<td>handle_result</td>
+							<td>VARCHAR(50)</td>
+							<td>普通索引</td>
+							<td>✅</td>
+							<td>-</td>
+							<td>字典：package_handle_result</td>
+							<td>办理结果</td>
+							<td>状态（待办理/办结等）</td>
+						</tr>
+						<tr>
+							<td>10</td>
+							<td>complete_time</td>
+							<td>DATETIME</td>
+							<td>普通索引</td>
+							<td>❌</td>
+							<td>NULL</td>
+							<td>-</td>
+							<td>办结时间</td>
+							<td>问题实际办结时间</td>
+						</tr>
+						<tr>
+							<td>11</td>
+							<td>handle_remark</td>
+							<td>TEXT</td>
+							<td>-</td>
+							<td>❌</td>
+							<td>-</td>
+							<td>-</td>
+							<td>-</td>
+							<td>办理详细说明（过程记录）</td>
+						</tr>
+						<tr>
+							<td>12</td>
+							<td>create_time</td>
+							<td>DATETIME</td>
+							<td>-</td>
+							<td>✅</td>
+							<td>CURRENT_TIMESTAMP</td>
+							<td>-</td>
+							<td>-</td>
+							<td>创建时间</td>
+						</tr>
+						<tr>
+							<td>13</td>
+							<td>update_time</td>
+							<td>DATETIME</td>
+							<td>-</td>
+							<td>✅</td>
+							<td>CURRENT_TIMESTAMP</td>
+							<td>-</td>
+							<td>-</td>
+							<td>更新时间</td>
+						</tr>
+						<tr>
+							<td>14</td>
+							<td>del_flag</td>
+							<td>TINYINT</td>
+							<td>联合索引</td>
+							<td>✅</td>
+							<td>0</td>
+							<td>-</td>
+							<td>-</td>
+							<td>逻辑删除</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<h2 id="part3">三、内容发布表（政策 / 通知）</h2>
+
+			<h4 id="t7">7. sme_policy（政策表）</h4>
+			<div class="table-wrapper">
+				<table>
+					<thead>
+						<tr>
+							<th>字段名</th>
+							<th>类型 / 说明</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>id</td>
+							<td>主键</td>
+							<td>唯一标识</td>
+						</tr>
+						<tr>
+							<td>title</td>
+							<td>varchar (255)，非空</td>
+							<td>政策标题</td>
+						</tr>
+						<tr>
+							<td>policy_type</td>
+							<td>bigint</td>
+							<td>政策类型（字典关联 policy_type）</td>
+						</tr>
+						<tr>
+							<td>dept_id</td>
+							<td>bigint，非空</td>
+							<td>发布部门 ID</td>
+						</tr>
+						<tr>
+							<td>publisher_id</td>
+							<td>bigint，非空</td>
+							<td>发布人 ID</td>
+						</tr>
+						<tr>
+							<td>content</td>
+							<td>longtext</td>
+							<td>政策内容（HTML 富文本）</td>
+						</tr>
+						<tr>
+							<td>publish_time</td>
+							<td>datetime</td>
+							<td>发布时间</td>
+						</tr>
+						<tr>
+							<td>is_top</td>
+							<td>tinyint，默认 0</td>
+							<td>是否置顶</td>
+						</tr>
+						<tr>
+							<td>is_show</td>
+							<td>tinyint，默认 1</td>
+							<td>是否显示</td>
+						</tr>
+						<tr>
+							<td>create_time</td>
+							<td>datetime，非空</td>
+							<td>创建时间</td>
+						</tr>
+						<tr>
+							<td>update_time</td>
+							<td>datetime</td>
+							<td>更新时间</td>
+						</tr>
+						<tr>
+							<td>del_flag</td>
+							<td>tinyint，默认 0</td>
+							<td>逻辑删除</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<h4 id="t8">8. sme_notice（通知表）</h4>
+			<div class="table-wrapper">
+				<table>
+					<thead>
+						<tr>
+							<th>字段名</th>
+							<th>类型 / 说明</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>id</td>
+							<td>主键</td>
+							<td>唯一标识</td>
+						</tr>
+						<tr>
+							<td>title</td>
+							<td>varchar (255)，非空</td>
+							<td>通知标题</td>
+						</tr>
+						<tr>
+							<td>notice_type</td>
+							<td>bigint</td>
+							<td>通知类型（字典关联 notice_type）</td>
+						</tr>
+						<tr>
+							<td>dept_id</td>
+							<td>bigint，非空</td>
+							<td>发布部门 ID</td>
+						</tr>
+						<tr>
+							<td>publisher_id</td>
+							<td>bigint，非空</td>
+							<td>发布人 ID</td>
+						</tr>
+						<tr>
+							<td>content</td>
+							<td>longtext</td>
+							<td>通知内容</td>
+						</tr>
+						<tr>
+							<td>publish_time</td>
+							<td>datetime</td>
+							<td>发布时间</td>
+						</tr>
+						<tr>
+							<td>is_top</td>
+							<td>tinyint，默认 0</td>
+							<td>是否置顶</td>
+						</tr>
+						<tr>
+							<td>is_show</td>
+							<td>tinyint，默认 1</td>
+							<td>是否显示</td>
+						</tr>
+						<tr>
+							<td>create_time</td>
+							<td>datetime，非空</td>
+							<td>创建时间</td>
+						</tr>
+						<tr>
+							<td>update_time</td>
+							<td>datetime</td>
+							<td>更新时间</td>
+						</tr>
+						<tr>
+							<td>del_flag</td>
+							<td>tinyint，默认 0</td>
+							<td>逻辑删除</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<h2 id="part4">四、建库语句</h2>
+			<pre>
+<span class="sql-comment">-- 创建数据库，指定utf8mb4字符集支持全量中文/特殊符号，排序规则适配中文</span>
+<span class="sql-keyword">CREATE DATABASE IF NOT EXISTS</span> gh_sme_service
+<span class="sql-keyword">DEFAULT CHARACTER SET</span> utf8mb4
+<span class="sql-keyword">DEFAULT COLLATE</span> utf8mb4_unicode_ci;
+
+<span class="sql-comment">-- 使用该数据库</span>
+<span class="sql-keyword">USE</span> gh_sme_service;</pre>
+
+			<h2 id="part5">五、完整建表语句</h2>
+
+			<h3>1. 系统用户表（sys_user）</h3>
+			<pre>
+<span class="sql-keyword">CREATE TABLE IF NOT EXISTS</span> sys_user (
+    id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL AUTO_INCREMENT</span> COMMENT '主键ID（自增）',
+    username <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">NOT NULL</span> COMMENT '用户账号（登录用）',
+    password <span class="sql-keyword">VARCHAR</span>(100) <span class="sql-keyword">NOT NULL</span> COMMENT '密码（BCrypt加密存储）',
+    real_name <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">NOT NULL</span> COMMENT '真实姓名',
+    phone <span class="sql-keyword">VARCHAR</span>(20) <span class="sql-keyword">DEFAULT</span> '' COMMENT '手机号（可做唯一校验）',
+    dept_id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '所属部门ID，关联sys_dept表',
+    role_id <span class="sql-keyword">BIGINT UNSIGNED DEFAULT</span> 0 COMMENT '角色ID（关联角色表，可扩展sys_role）',
+    status <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 1 COMMENT '状态：0-禁用 / 1-启用',
+    create_time <span class="sql-keyword">DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP</span> COMMENT '创建时间',
+    update_time <span class="sql-keyword">DATETIME ON UPDATE CURRENT_TIMESTAMP</span> COMMENT '更新时间',
+    del_flag <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 0 COMMENT '逻辑删除：0-未删 / 1-已删',
+    <span class="sql-keyword">PRIMARY KEY</span> (id),
+    <span class="sql-keyword">UNIQUE KEY</span> uk_username (username),
+    <span class="sql-keyword">KEY</span> idx_dept_id (dept_id),
+    <span class="sql-keyword">KEY</span> idx_status_del (status, del_flag)
+) ENGINE=InnoDB <span class="sql-keyword">DEFAULT CHARSET</span>=utf8mb4 COMMENT='系统用户表';</pre>
+
+			<h3>2. 系统部门表（sys_dept）</h3>
+			<pre>
+<span class="sql-keyword">CREATE TABLE IF NOT EXISTS</span> sys_dept (
+    id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL AUTO_INCREMENT</span> COMMENT '主键ID',
+    dept_name <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">NOT NULL</span> COMMENT '部门名称',
+    dept_code <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">NOT NULL</span> COMMENT '部门编码',
+    parent_id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL DEFAULT</span> 0 COMMENT '上级部门ID（0为顶级）',
+    leader <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">DEFAULT</span> '' COMMENT '部门负责人',
+    phone <span class="sql-keyword">VARCHAR</span>(20) <span class="sql-keyword">DEFAULT</span> '' COMMENT '部门联系电话',
+    status <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 1 COMMENT '状态：0-禁用 / 1-启用',
+    create_time <span class="sql-keyword">DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP</span> COMMENT '创建时间',
+    update_time <span class="sql-keyword">DATETIME ON UPDATE CURRENT_TIMESTAMP</span> COMMENT '更新时间',
+    del_flag <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 0 COMMENT '逻辑删除：0-未删 / 1-已删',
+    <span class="sql-keyword">PRIMARY KEY</span> (id),
+    <span class="sql-keyword">UNIQUE KEY</span> uk_dept_code (dept_code),
+    <span class="sql-keyword">KEY</span> idx_parent_id (parent_id),
+    <span class="sql-keyword">KEY</span> idx_status_del (status, del_flag)
+) ENGINE=InnoDB <span class="sql-keyword">DEFAULT CHARSET</span>=utf8mb4 COMMENT='系统部门表（含乡镇）';</pre>
+
+			<h3>3. 系统字典主表（sys_dict）</h3>
+			<pre>
+<span class="sql-keyword">CREATE TABLE IF NOT EXISTS</span> sys_dict (
+    id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL AUTO_INCREMENT</span> COMMENT '主键ID',
+    dict_code <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">NOT NULL</span> COMMENT '字典编码（唯一）',
+    dict_name <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">NOT NULL</span> COMMENT '字典名称',
+    sort <span class="sql-keyword">INT NOT NULL DEFAULT</span> 0 COMMENT '排序',
+    status <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 1 COMMENT '状态：0-禁用 / 1-启用',
+    create_time <span class="sql-keyword">DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP</span> COMMENT '创建时间',
+    update_time <span class="sql-keyword">DATETIME ON UPDATE CURRENT_TIMESTAMP</span> COMMENT '更新时间',
+    del_flag <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 0 COMMENT '逻辑删除：0-未删 / 1-已删',
+    <span class="sql-keyword">PRIMARY KEY</span> (id),
+    <span class="sql-keyword">UNIQUE KEY</span> uk_dict_code (dict_code),
+    <span class="sql-keyword">KEY</span> idx_status_del (status, del_flag)
+) ENGINE=InnoDB <span class="sql-keyword">DEFAULT CHARSET</span>=utf8mb4 COMMENT='系统字典主表';</pre>
+
+			<h3>4. 系统字典项表（sys_dict_item）</h3>
+			<pre>
+<span class="sql-keyword">CREATE TABLE IF NOT EXISTS</span> sys_dict_item (
+    id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL AUTO_INCREMENT</span> COMMENT '主键ID',
+    dict_id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '关联字典主表sys_dict.id',
+    item_code <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">NOT NULL</span> COMMENT '项编码',
+    item_name <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">NOT NULL</span> COMMENT '项名称',
+    sort <span class="sql-keyword">INT NOT NULL DEFAULT</span> 0 COMMENT '排序',
+    status <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 1 COMMENT '状态：0-禁用 / 1-启用',
+    create_time <span class="sql-keyword">DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP</span> COMMENT '创建时间',
+    update_time <span class="sql-keyword">DATETIME ON UPDATE CURRENT_TIMESTAMP</span> COMMENT '更新时间',
+    del_flag <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 0 COMMENT '逻辑删除：0-未删 / 1-已删',
+    <span class="sql-keyword">PRIMARY KEY</span> (id),
+    <span class="sql-keyword">KEY</span> idx_dict_id (dict_id),
+    <span class="sql-keyword">KEY</span> idx_status_del (status, del_flag)
+) ENGINE=InnoDB <span class="sql-keyword">DEFAULT CHARSET</span>=utf8mb4 COMMENT='系统字典项表';</pre>
+
+			<h3>5. 中小微企业表（sme_enterprise）</h3>
+			<pre>
+<span class="sql-keyword">CREATE TABLE IF NOT EXISTS</span> sme_enterprise (
+    id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL AUTO_INCREMENT</span> COMMENT '主键ID',
+    enterprise_name <span class="sql-keyword">VARCHAR</span>(100) <span class="sql-keyword">NOT NULL</span> COMMENT '企业名称',
+    credit_code <span class="sql-keyword">VARCHAR</span>(20) <span class="sql-keyword">NOT NULL</span> COMMENT '统一社会信用代码',
+    enterprise_type <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '企业类型（关联sys_dict_item，字典编码enterprise_type）',
+    business_addr <span class="sql-keyword">VARCHAR</span>(255) <span class="sql-keyword">DEFAULT</span> '' COMMENT '经营地址',
+    legal_person <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">DEFAULT</span> '' COMMENT '法定代表人',
+    phone <span class="sql-keyword">VARCHAR</span>(20) <span class="sql-keyword">DEFAULT</span> '' COMMENT '企业联系电话',
+    reg_capital <span class="sql-keyword">DECIMAL</span>(18,2) <span class="sql-keyword">DEFAULT</span> 0.00 COMMENT '注册资本（万元）',
+    establish_time <span class="sql-keyword">DATE</span> COMMENT '成立时间',
+    town_id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '所属乡镇（关联sys_dict_item，字典编码town）',
+    industry_id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '所属行业（关联sys_dict_item，字典编码industry）',
+    business_status <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '经营状态（关联sys_dict_item，字典编码business_status）',
+    create_time <span class="sql-keyword">DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP</span> COMMENT '创建时间',
+    update_time <span class="sql-keyword">DATETIME ON UPDATE CURRENT_TIMESTAMP</span> COMMENT '更新时间',
+    del_flag <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 0 COMMENT '逻辑删除：0-未删 / 1-已删',
+    <span class="sql-keyword">PRIMARY KEY</span> (id),
+    <span class="sql-keyword">UNIQUE KEY</span> uk_enterprise_name (enterprise_name),
+    <span class="sql-keyword">UNIQUE KEY</span> uk_credit_code (credit_code),
+    <span class="sql-keyword">KEY</span> idx_enterprise_type (enterprise_type),
+    <span class="sql-keyword">KEY</span> idx_town_id (town_id),
+    <span class="sql-keyword">KEY</span> idx_industry_id (industry_id),
+    <span class="sql-keyword">KEY</span> idx_business_status (business_status),
+    <span class="sql-keyword">KEY</span> idx_del_flag (del_flag)
+) ENGINE=InnoDB <span class="sql-keyword">DEFAULT CHARSET</span>=utf8mb4 COMMENT='中小微企业表';</pre>
+
+			<h3>6. 包抓联服务表（sme_package_service）</h3>
+			<pre>
+<span class="sql-keyword">CREATE TABLE IF NOT EXISTS</span> sme_package_service (
+    id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL AUTO_INCREMENT</span> COMMENT '主键ID（自增）',
+    package_no <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">DEFAULT</span> '' COMMENT '包抓联编号（系统自动生成）',
+    dept_id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '包联部门ID，关联sys_dept.id',
+    leader_item_code <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">NOT NULL</span> COMMENT '包联领导编码，关联sys_dict_item.item_code',
+    enterprise_id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '包联企业ID，关联sme_enterprise.id',
+    enterprise_problem <span class="sql-keyword">TEXT NOT NULL</span> COMMENT '包联企业反映的问题',
+    problem_receive_time <span class="sql-keyword">DATETIME NOT NULL</span> COMMENT '问题接收时间',
+    problem_type <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">NOT NULL</span> COMMENT '问题类型，关联sys_dict_item.item_code',
+    handle_result <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">NOT NULL</span> COMMENT '办理结果，关联sys_dict_item.item_code',
+    complete_time <span class="sql-keyword">DATETIME</span> COMMENT '办结时间（未办结为NULL）',
+    handle_remark <span class="sql-keyword">TEXT</span> COMMENT '办理详细说明',
+    create_time <span class="sql-keyword">DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP</span> COMMENT '创建时间',
+    update_time <span class="sql-keyword">DATETIME ON UPDATE CURRENT_TIMESTAMP</span> COMMENT '更新时间',
+    del_flag <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 0 COMMENT '逻辑删除：0-未删 / 1-已删',
+    <span class="sql-keyword">PRIMARY KEY</span> (id),
+    <span class="sql-keyword">UNIQUE KEY</span> uk_package_no (package_no),
+    <span class="sql-keyword">KEY</span> idx_dept_id (dept_id),
+    <span class="sql-keyword">KEY</span> idx_leader_item_code (leader_item_code),
+    <span class="sql-keyword">KEY</span> idx_enterprise_id (enterprise_id),
+    <span class="sql-keyword">KEY</span> idx_problem_type (problem_type),
+    <span class="sql-keyword">KEY</span> idx_handle_result (handle_result),
+    <span class="sql-keyword">KEY</span> idx_problem_receive_time (problem_receive_time),
+    <span class="sql-keyword">KEY</span> idx_del_flag (del_flag)
+) ENGINE=InnoDB <span class="sql-keyword">DEFAULT CHARSET</span>=utf8mb4 COMMENT='企业包抓联服务表';</pre>
+
+			<h3>7. 政策发布表（sme_policy）</h3>
+			<pre>
+<span class="sql-keyword">CREATE TABLE IF NOT EXISTS</span> sme_policy (
+    id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL AUTO_INCREMENT</span> COMMENT '主键ID',
+    title <span class="sql-keyword">VARCHAR</span>(255) <span class="sql-keyword">NOT NULL</span> COMMENT '政策标题',
+    policy_type <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '政策类型（关联sys_dict_item，字典编码policy_type）',
+    dept_id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '发布部门ID，关联sys_dept.id',
+    publisher_id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '发布人ID，关联sys_user.id',
+    content <span class="sql-keyword">LONGTEXT</span> COMMENT '政策内容',
+    publish_time <span class="sql-keyword">DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP</span> COMMENT '发布时间',
+    is_top <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 0 COMMENT '是否置顶：0-否 / 1-是',
+    is_show <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 1 COMMENT '是否显示：0-隐藏 / 1-显示',
+    create_time <span class="sql-keyword">DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP</span> COMMENT '创建时间',
+    update_time <span class="sql-keyword">DATETIME ON UPDATE CURRENT_TIMESTAMP</span> COMMENT '更新时间',
+    del_flag <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 0 COMMENT '逻辑删除：0-未删 / 1-已删',
+    <span class="sql-keyword">PRIMARY KEY</span> (id),
+    <span class="sql-keyword">KEY</span> idx_dept_id (dept_id),
+    <span class="sql-keyword">KEY</span> idx_publisher_id (publisher_id),
+    <span class="sql-keyword">KEY</span> idx_policy_type (policy_type),
+    <span class="sql-keyword">KEY</span> idx_is_top (is_top),
+    <span class="sql-keyword">KEY</span> idx_is_show (is_show),
+    <span class="sql-keyword">KEY</span> idx_del_flag (del_flag)
+) ENGINE=InnoDB <span class="sql-keyword">DEFAULT CHARSET</span>=utf8mb4 COMMENT='政策发布表';</pre>
+
+			<h3>8. 信息通知表（sme_notice）</h3>
+			<pre>
+<span class="sql-keyword">CREATE TABLE IF NOT EXISTS</span> sme_notice (
+    id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL AUTO_INCREMENT</span> COMMENT '主键ID',
+    title <span class="sql-keyword">VARCHAR</span>(255) <span class="sql-keyword">NOT NULL</span> COMMENT '通知标题',
+    notice_type <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '通知类型（关联sys_dict_item，字典编码notice_type）',
+    dept_id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '发布部门ID，关联sys_dept.id',
+    publisher_id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '发布人ID，关联sys_user.id',
+    content <span class="sql-keyword">LONGTEXT</span> COMMENT '通知内容',
+    publish_time <span class="sql-keyword">DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP</span> COMMENT '发布时间',
+    is_top <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 0 COMMENT '是否置顶：0-否 / 1-是',
+    is_show <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 1 COMMENT '是否显示：0-隐藏 / 1-显示',
+    create_time <span class="sql-keyword">DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP</span> COMMENT '创建时间',
+    update_time <span class="sql-keyword">DATETIME ON UPDATE CURRENT_TIMESTAMP</span> COMMENT '更新时间',
+    del_flag <span class="sql-keyword">TINYINT NOT NULL DEFAULT</span> 0 COMMENT '逻辑删除：0-未删 / 1-已删',
+    <span class="sql-keyword">PRIMARY KEY</span> (id),
+    <span class="sql-keyword">KEY</span> idx_dept_id (dept_id),
+    <span class="sql-keyword">KEY</span> idx_publisher_id (publisher_id),
+    <span class="sql-keyword">KEY</span> idx_notice_type (notice_type),
+    <span class="sql-keyword">KEY</span> idx_is_top (is_top),
+    <span class="sql-keyword">KEY</span> idx_is_show (is_show),
+    <span class="sql-keyword">KEY</span> idx_del_flag (del_flag)
+) ENGINE=InnoDB <span class="sql-keyword">DEFAULT CHARSET</span>=utf8mb4 COMMENT='信息通知发布表';</pre>
+
+			<h2 id="part6">六、模拟数据（贴合广河县政务业务）</h2>
+
+			<h3>1. 系统部门模拟数据</h3>
+			<pre>
+<span class="sql-keyword">INSERT INTO</span> sys_dept (dept_name, dept_code, parent_id, leader, phone) <span class="sql-keyword">VALUES</span>
+(<span class="sql-string">'广河县工业和信息化局'</span>, <span class="sql-string">'GH_GXJ'</span>, 0, <span class="sql-string">'马局长'</span>, <span class="sql-string">'13800138001'</span>),
+(<span class="sql-string">'广河县商务局'</span>, <span class="sql-string">'GH_SWJ'</span>, 0, <span class="sql-string">'李局长'</span>, <span class="sql-string">'13800138002'</span>),
+(<span class="sql-string">'广河县城关镇人民政府'</span>, <span class="sql-string">'GH_CGZ'</span>, 0, <span class="sql-string">'王镇长'</span>, <span class="sql-string">'13800138003'</span>),
+(<span class="sql-string">'广河县三甲集镇人民政府'</span>, <span class="sql-string">'GH_SJJZ'</span>, 0, <span class="sql-string">'张镇长'</span>, <span class="sql-string">'13800138004'</span>),
+(<span class="sql-string">'广河县发改局'</span>, <span class="sql-string">'GH_FGJ'</span>, 0, <span class="sql-string">'刘局长'</span>, <span class="sql-string">'13800138005'</span>);</pre>
+
+			<h3>2. 系统用户模拟数据 (密码 123456)</h3>
+			<pre>
+<span class="sql-comment">-- 密码统一为：123456</span>
+<span class="sql-keyword">INSERT INTO</span> sys_user (username, password, real_name, phone, dept_id, role_id) <span class="sql-keyword">VALUES</span>
+(<span class="sql-string">'admin'</span>, <span class="sql-string">'$2a$10$e8UvR80w5Q7hX89Y76Z654.5432109876543210'</span>, <span class="sql-string">'系统管理员'</span>, <span class="sql-string">'13900139001'</span>, 1, 1),
+(<span class="sql-string">'liuming'</span>, <span class="sql-string">'$2a$10$e8UvR80w5Q7hX89Y76Z654.5432109876543210'</span>, <span class="sql-string">'刘明'</span>, <span class="sql-string">'13900139002'</span>, 1, 2),
+(<span class="sql-string">'wanghong'</span>, <span class="sql-string">'$2a$10$e8UvR80w5Q7hX89Y76Z654.5432109876543210'</span>, <span class="sql-string">'王红'</span>, <span class="sql-string">'13900139003'</span>, 3, 2),
+(<span class="sql-string">'zhangsan'</span>, <span class="sql-string">'$2a$10$e8UvR80w5Q7hX89Y76Z654.5432109876543210'</span>, <span class="sql-string">'张三'</span>, <span class="sql-string">'13900139004'</span>, 5, 3);</pre>
+
+			<h3>3. 系统字典模拟数据</h3>
+			<pre>
+<span class="sql-keyword">INSERT INTO</span> sys_dict (dict_code, dict_name, sort) <span class="sql-keyword">VALUES</span>
+(<span class="sql-string">'enterprise_type'</span>, <span class="sql-string">'企业类型'</span>, 10),
+(<span class="sql-string">'town'</span>, <span class="sql-string">'所属乡镇'</span>, 20),
+(<span class="sql-string">'industry'</span>, <span class="sql-string">'所属行业'</span>, 30),
+(<span class="sql-string">'business_status'</span>, <span class="sql-string">'企业经营状态'</span>, 40),
+(<span class="sql-string">'package_leader'</span>, <span class="sql-string">'包联领导'</span>, 50),
+(<span class="sql-string">'package_problem_type'</span>, <span class="sql-string">'包联问题类型'</span>, 60),
+(<span class="sql-string">'package_handle_result'</span>, <span class="sql-string">'包联办理结果'</span>, 70),
+(<span class="sql-string">'policy_type'</span>, <span class="sql-string">'政策类型'</span>, 80),
+(<span class="sql-string">'notice_type'</span>, <span class="sql-string">'通知类型'</span>, 90);</pre>
+
+			<h3>4. 字典项详细模拟数据</h3>
+			<pre>
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'MICRO'</span>, <span class="sql-string">'微型企业'</span>, 1 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'enterprise_type'</span>;
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'SMALL'</span>, <span class="sql-string">'小型企业'</span>, 2 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'enterprise_type'</span>;
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'MEDIUM'</span>, <span class="sql-string">'中型企业'</span>, 3 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'enterprise_type'</span>;
+
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'CHENGGUAN'</span>, <span class="sql-string">'城关镇'</span>, 1 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'town'</span>;
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'SJJZ'</span>, <span class="sql-string">'三甲集镇'</span>, 2 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'town'</span>;
+
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'GY'</span>, <span class="sql-string">'工业'</span>, 1 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'industry'</span>;
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'YW'</span>, <span class="sql-string">'商贸业'</span>, 2 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'industry'</span>;
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'NY'</span>, <span class="sql-string">'农业加工'</span>, 3 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'industry'</span>;
+
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'NORMAL'</span>, <span class="sql-string">'正常经营'</span>, 1 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'business_status'</span>;
+
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'LD001'</span>, <span class="sql-string">'马书记（县委书记）'</span>, 1 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'package_leader'</span>;
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'LD002'</span>, <span class="sql-string">'李县长（县长）'</span>, 2 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'package_leader'</span>;
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'LD003'</span>, <span class="sql-string">'王副县长（分管工信）'</span>, 3 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'package_leader'</span>;
+
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'FINANCING'</span>, <span class="sql-string">'企业融资'</span>, 1 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'package_problem_type'</span>;
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'PERSONNEL'</span>, <span class="sql-string">'人才用工'</span>, 2 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'package_problem_type'</span>;
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'POLICY'</span>, <span class="sql-string">'政策享受'</span>, 3 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'package_problem_type'</span>;
+
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'PENDING'</span>, <span class="sql-string">'待办理'</span>, 1 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'package_handle_result'</span>;
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'PROCESSING'</span>, <span class="sql-string">'办理中'</span>, 2 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'package_handle_result'</span>;
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'COMPLETED'</span>, <span class="sql-string">'已办结'</span>, 3 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'package_handle_result'</span>;
+
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'FINANCE'</span>, <span class="sql-string">'金融扶持'</span>, 1 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'policy_type'</span>;
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'TAX'</span>, <span class="sql-string">'税收优惠'</span>, 2 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'policy_type'</span>;
+
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'NOTICE'</span>, <span class="sql-string">'普通通知'</span>, 1 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'notice_type'</span>;
+<span class="sql-keyword">INSERT INTO</span> sys_dict_item (dict_id, item_code, item_name, sort)
+<span class="sql-keyword">SELECT</span> d.id, <span class="sql-string">'WARNING'</span>, <span class="sql-string">'提醒通知'</span>, 2 <span class="sql-keyword">FROM</span> sys_dict d <span class="sql-keyword">WHERE</span> d.dict_code = <span class="sql-string">'notice_type'</span>;</pre>
+
+			<h3>5. 企业模拟数据</h3>
+			<pre>
+<span class="sql-keyword">INSERT INTO</span> sme_enterprise (enterprise_name, credit_code, enterprise_type, business_addr, legal_person, phone, reg_capital, establish_time, town_id, industry_id, business_status)
+<span class="sql-keyword">VALUES</span>
+(<span class="sql-string">'广河县鑫源食品加工厂'</span>, <span class="sql-string">'91622924MA748X1234'</span>, (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'SMALL'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'enterprise_type'</span>)), <span class="sql-string">'广河县城关镇工业园区'</span>, <span class="sql-string">'马明'</span>, <span class="sql-string">'13700137001'</span>, 500.00, <span class="sql-string">'2018-05-10'</span>, (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'CHENGGUAN'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'town'</span>)), (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'NY'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'industry'</span>)), (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'NORMAL'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'business_status'</span>))),
+(<span class="sql-string">'广河县盛达机械制造有限公司'</span>, <span class="sql-string">'91622924MA748X5678'</span>, (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'MEDIUM'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'enterprise_type'</span>)), <span class="sql-string">'广河县三甲集镇工业路'</span>, <span class="sql-string">'李强'</span>, <span class="sql-string">'13700137002'</span>, 2000.00, <span class="sql-string">'2015-08-20'</span>, (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'SJJZ'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'town'</span>)), (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'GY'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'industry'</span>)), (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'NORMAL'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'business_status'</span>))),
+(<span class="sql-string">'广河县惠民超市连锁有限公司'</span>, <span class="sql-string">'91622924MA748X9012'</span>, (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'MICRO'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'enterprise_type'</span>)), <span class="sql-string">'广河县城关镇人民路'</span>, <span class="sql-string">'王丽'</span>, <span class="sql-string">'13700137003'</span>, 100.00, <span class="sql-string">'2020-03-15'</span>, (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'CHENGGUAN'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'town'</span>)), (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'YW'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'industry'</span>)), (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'NORMAL'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'business_status'</span>)));</pre>
+
+			<h3>6. 包抓联服务模拟数据</h3>
+			<pre>
+<span class="sql-keyword">INSERT INTO</span> sme_package_service (package_no, dept_id, leader_item_code, enterprise_id, enterprise_problem, problem_receive_time, problem_type, handle_result, complete_time, handle_remark)
+<span class="sql-keyword">VALUES</span>
+(<span class="sql-string">'GH_BZL_202502001'</span>, 1, <span class="sql-string">'LD003'</span>, 1, <span class="sql-string">'企业扩大生产需要流动资金，申请银行贷款贴息支持'</span>, <span class="sql-string">'2025-02-01 09:30:00'</span>, <span class="sql-string">'FINANCING'</span>, <span class="sql-string">'PROCESSING'</span>, <span class="sql-keyword">NULL</span>, <span class="sql-string">'已对接县农商行，正在收集企业贷款资料'</span>),
+(<span class="sql-string">'GH_BZL_202502002'</span>, 1, <span class="sql-string">'LD002'</span>, 2, <span class="sql-string">'企业急需机械加工技术工人5名，希望政府协助招聘'</span>, <span class="sql-string">'2025-02-03 14:00:00'</span>, <span class="sql-string">'PERSONNEL'</span>, <span class="sql-string">'COMPLETED'</span>, <span class="sql-string">'2025-02-10 16:00:00'</span>, <span class="sql-string">'已通过县人社局发布招聘信息，成功招聘4名技术工人，1名待面试'</span>),
+(<span class="sql-string">'GH_BZL_202502003'</span>, 3, <span class="sql-string">'LD001'</span>, 3, <span class="sql-string">'希望了解最新的商贸企业扶持政策，申请政策补贴'</span>, <span class="sql-string">'2025-02-05 10:00:00'</span>, <span class="sql-string">'POLICY'</span>, <span class="sql-string">'PENDING'</span>, <span class="sql-keyword">NULL</span>, <span class="sql-string">'待整理最新政策文件后对接企业'</span>);</pre>
+
+			<h3>7. 政策发布模拟数据</h3>
+			<pre>
+<span class="sql-keyword">INSERT INTO</span> sme_policy (title, policy_type, dept_id, publisher_id, content, publish_time, is_top)
+<span class="sql-keyword">VALUES</span>
+(<span class="sql-string">'2025年广河县中小微企业金融扶持政策'</span>, (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'FINANCE'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'policy_type'</span>)), 1, 1, <span class="sql-string">'&lt;p&gt;为支持县域中小微企业发展，2025年我县对符合条件的企业给予贷款贴息50%，最高贴息10万元，申报时间2025年2月-12月。&lt;/p&gt;'</span>, <span class="sql-string">'2025-01-20 09:00:00'</span>, 1),
+(<span class="sql-string">'2025年广河县产业扶持税收优惠政策'</span>, (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'TAX'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'policy_type'</span>)), 1, 2, <span class="sql-string">'&lt;p&gt;对县域内工业企业年纳税额增长10%以上的，给予地方留存部分30%的返还，具体申报流程见附件。&lt;/p&gt;'</span>, <span class="sql-string">'2025-01-25 15:00:00'</span>, 0);</pre>
+
+			<h3>8. 信息通知模拟数据</h3>
+			<pre>
+<span class="sql-keyword">INSERT INTO</span> sme_notice (title, notice_type, dept_id, publisher_id, content, publish_time, is_top)
+<span class="sql-keyword">VALUES</span>
+(<span class="sql-string">'关于开展2025年中小微企业经营状况调研的通知'</span>, (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'NOTICE'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'notice_type'</span>)), 1, 2, <span class="sql-string">'请各企业于2025年2月20日前完成经营状况调研表填写，报送至县工信局企业服务科，联系电话：13800138005。'</span>, <span class="sql-string">'2025-02-08 09:00:00'</span>, 1),
+(<span class="sql-string">'【提醒】2025年第一季度政策补贴申报即将截止'</span>, (<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict_item <span class="sql-keyword">WHERE</span> item_code=<span class="sql-string">'WARNING'</span> <span class="sql-keyword">AND</span> dict_id=(<span class="sql-keyword">SELECT</span> id <span class="sql-keyword">FROM</span> sys_dict <span class="sql-keyword">WHERE</span> dict_code=<span class="sql-string">'notice_type'</span>)), 1, 4, <span class="sql-string">'2025年第一季度中小微企业政策补贴申报截止时间为2025年2月28日，请尚未申报的企业尽快办理。'</span>, <span class="sql-string">'2025-02-15 14:00:00'</span>, 1);</pre>
+
+			<h2 id="part7">七、使用说明</h2>
+			<ol>
+				<li>
+					<strong>执行顺序</strong
+					>：先执行建库语句，再按「基础表→业务表→发布表」顺序执行建表语句，最后执行模拟数据；
+				</li>
+				<li>
+					<strong>密码说明</strong>：模拟用户的密码统一为
+					123456，BCrypt 加密后存储，可直接用于系统登录测试；
+				</li>
+				<li>
+					<strong>关联说明</strong>：所有模拟数据的表关联字段（如
+					dept_id / enterprise_id / 字典
+					ID）均通过子查询自动获取，无需手动修改 ID 值；
+				</li>
+				<li>
+					<strong>扩展说明</strong
+					>：可根据广河县实际部门、乡镇、企业、领导名单扩展模拟数据，仅需按现有格式补充即可；
+				</li>
+			</ol>
+
+			<h3>测试查询 SQL：全关联查询</h3>
+			<pre>
+<span class="sql-keyword">SELECT</span>
+    b.package_no,
+    d.dept_name <span class="sql-keyword">AS</span> 包联部门,
+    l.item_name <span class="sql-keyword">AS</span> 包联领导,
+    e.enterprise_name <span class="sql-keyword">AS</span> 包联企业,
+    b.enterprise_problem <span class="sql-keyword">AS</span> 反映问题,
+    pt.item_name <span class="sql-keyword">AS</span> 问题类型,
+    hr.item_name <span class="sql-keyword">AS</span> 办理结果,
+    b.problem_receive_time <span class="sql-keyword">AS</span> 接收时间,
+    b.complete_time <span class="sql-keyword">AS</span> 办结时间
+<span class="sql-keyword">FROM</span> sme_package_service b
+<span class="sql-keyword">LEFT JOIN</span> sys_dept d <span class="sql-keyword">ON</span> b.dept_id = d.id
+<span class="sql-keyword">LEFT JOIN</span> sys_dict_item l <span class="sql-keyword">ON</span> b.leader_item_code = l.item_code
+<span class="sql-keyword">LEFT JOIN</span> sme_enterprise e <span class="sql-keyword">ON</span> b.enterprise_id = e.id
+<span class="sql-keyword">LEFT JOIN</span> sys_dict_item pt <span class="sql-keyword">ON</span> b.problem_type = pt.item_code
+<span class="sql-keyword">LEFT JOIN</span> sys_dict_item hr <span class="sql-keyword">ON</span> b.handle_result = hr.item_code
+<span class="sql-keyword">WHERE</span> b.del_flag = 0;</pre>
+
+			<div
+				style="
+					margin-top: 2rem;
+					padding-bottom: 2rem;
+					text-align: center;
+					color: #999;
+					font-size: 0.8rem;
+					border-top: 1px solid #eee;
+					padding-top: 2rem;
+				">
+				&copy; 2026 广河县中小微企业服务系统数据库文档
+			</div>
+		</div>
+	</body>
+</html>

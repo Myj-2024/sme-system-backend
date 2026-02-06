@@ -1,0 +1,66 @@
+# 服务器配置
+server:
+  port: 8080
+  servlet:
+    context-path: /sme # 项目根路径
+  tomcat:
+    uri-encoding: UTF-8 # Java17中文乱码处理
+
+# Spring核心配置
+spring:
+  application:
+    name: gh-sme-service
+  # 数据源配置（MySQL8.0+，Java17适配）
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/gh_sme_service?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowMultiQueries=true&rewriteBatchedStatements=true
+    username: root # 你的MySQL用户名
+    password: root # 你的MySQL密码
+    hikari:
+      maximum-pool-size: 20 # 连接池大小
+      minimum-idle: 5
+  # 热部署配置
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+  # Spring Data JDBC配置
+  data:
+    jdbc:
+      repositories:
+        enabled: true # 开启Repository自动扫描
+      mapping:
+        underscore-to-camel-case: true # 下划线转驼峰
+
+# 原生MyBatis配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml # 扫描Mapper.xml文件
+  type-aliases-package: com.sme.pojo.entity # 实体类别名包
+  configuration:
+    map-underscore-to-camel-case: true # 下划线转驼峰
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印SQL日志（开发用）
+    call-setters-on-nulls: true # 处理null值返回
+
+# Spring Doc配置
+# Spring Doc配置（仅保留基础配置，核心信息由配置类管理）
+springdoc:
+  api-docs:
+    enabled: true # 开启API文档生成（生产环境可关闭）
+    path: /v3/api-docs # API文档JSON数据路径（默认，无需修改）
+  swagger-ui:
+    enabled: true # 开启SwaggerUI界面
+    path: /doc.html # 自定义访问路径（和Knife4j一致）
+    operationsSorter: method # 接口按请求方法排序（GET/POST/PUT/DELETE）
+    tagsSorter: alpha # 接口标签按字母排序
+    doc-expansion: none # 文档默认折叠（可选：list-展开列表，full-全部展开）
+    default-model-expand-depth: 1 # 模型默认展开深度
+
+# 日志配置
+logging:
+  level:
+    com.sme: info # 项目包日志级别
+    org.mybatis: debug # MyBatis日志级别
+    org.springframework.data.jdbc: debug # Spring Data JDBC日志级别
+    org.springframework.web: info
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"
