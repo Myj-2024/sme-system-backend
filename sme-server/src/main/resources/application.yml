@@ -69,3 +69,8 @@ pagehelper:
   reasonable: true
   support-methods-arguments: true
   params: count=countSql
+
+jwt:
+  secret: mySecretKey1234567890123456789012345678901234567890123456789
+  expiration: 86400 # 令牌有效期（秒），86400=24小时
+  header: Authorization

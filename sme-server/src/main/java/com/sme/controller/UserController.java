@@ -8,6 +8,7 @@ import com.sme.result.Result;
 import com.sme.result.ResultCode;
 import com.sme.service.UserService;
 import com.sme.utils.PageUtils;
+import com.sme.utils.UserContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -66,5 +67,20 @@ public class UserController {
         PageInfo<User> pageInfo = new PageInfo<>(users);
         Map<String, Object> pageResult = PageUtils.toPageResult(pageInfo);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 获取当前用户信息
+     */
+    @GetMapping("/info")
+    public Result<User> getCurrentUserInfo(){
+         Long userId =UserContext.getUserId();
+         if (userId != null){
+             User user = userService.findById(userId);
+             if (user != null){
+                 return Result.success(user);
+             }
+         }
+         return Result.error(ResultCode.USER_NOT_EXIST);
     }
 }
