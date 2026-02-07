@@ -3,6 +3,7 @@ package com.sme.service.impl;
 import com.sme.dto.UserLoginDTO;
 import com.sme.entity.User;
 import com.sme.exception.BaseException;
+import com.sme.mapper.RoleMapper;
 import com.sme.mapper.UserMapper;
 import com.sme.service.UserService;
 import com.sme.utils.JwtUtil;
@@ -24,6 +25,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private RoleMapper roleMapper;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -97,6 +101,21 @@ public class UserServiceImpl implements UserService {
             log.error("删除用户失败：{}", e.getMessage(), e);
             throw new BaseException("删除用户失败：" + e.getMessage());
         }
+    }
+
+    /**
+     * 获取用户信息（包含角色信息）
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public User findUserWithRoleById(Long userId) {
+        User user = userMapper.findById(userId);
+        if (user != null){
+            user.setRoles(roleMapper.findRolesByUserId(userId));
+        }
+        return user;
     }
 
     @Override

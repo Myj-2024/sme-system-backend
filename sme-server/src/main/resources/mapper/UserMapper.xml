@@ -2,8 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sme.mapper.UserMapper">
 
-<!--    结果映射-->
-
+    <!-- 基础结果映射（严格匹配sys_user表结构，移除不存在的role_id） -->
     <resultMap id="UserResultMap" type="com.sme.entity.User">
         <id column="id" property="id" />
         <result column="username" property="username" />
@@ -11,34 +10,63 @@
         <result column="real_name" property="realName" />
         <result column="phone" property="phone" />
         <result column="dept_id" property="deptId" />
-        <result column="role_id" property="roleId" />
         <result column="status" property="status" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
+        <result column="del_flag" property="delFlag" />
     </resultMap>
 
-<!--    查询用户列表-->
-    <select id="findAll" resultMap="UserResultMap">
-        select * from sys_user
+    <!-- 关联角色的结果映射（继承基础映射+角色列表） -->
+    <resultMap id="UserWithRolesResultMap" type="com.sme.entity.User" extends="UserResultMap">
+        <collection property="roles" ofType="com.sme.entity.Role">
+            <id column="r_id" property="id"/>
+            <result column="r_role_name" property="name"/>    <!-- sys_role.role_name → Role.name -->
+            <result column="r_role_code" property="code"/>    <!-- sys_role.role_code → Role.code -->
+            <result column="r_description" property="description"/>
+            <result column="r_status" property="status"/>
+        </collection>
+    </resultMap>
+
+    <!-- 查询用户列表（关联角色，适配真实表结构） -->
+    <select id="findAll" resultMap="UserWithRolesResultMap">
+        SELECT
+            u.id, u.username, u.password, u.real_name, u.phone, u.dept_id,
+            u.status, u.create_time, u.update_time, u.del_flag,
+            r.id as r_id, r.role_name as r_role_name, r.role_code as r_role_code,
+            r.description as r_description, r.status as r_status
+        FROM sys_user u
+                 LEFT JOIN user_role ur ON u.id = ur.user_id
+                 LEFT JOIN sys_role r ON ur.role_id = r.id
+        WHERE u.del_flag = 0
+          AND (r.del_flag = 0 OR r.del_flag IS NULL)
     </select>
 
-<!--    根据ID查询用户信息-->
+    <!-- 根据ID查询用户（无role_id） -->
     <select id="findById" parameterType="long" resultMap="UserResultMap">
-        select * from sys_user where id = #{id}
-    </select>
-<!--    根据用户名查询用户信息-->
-    <select id="findByUserName" parameterType="string"  resultType="com.sme.entity.User">
-        select * from sys_user where username = #{username}
+        select id, username, password, real_name, phone, dept_id,
+               status, create_time, update_time, del_flag
+        from sys_user
+        where id = #{id} and del_flag = 0
     </select>
 
-    <!--    新增用户-->
+    <!-- 根据用户名查询用户（无role_id） -->
+    <select id="findByUserName" parameterType="string" resultType="com.sme.entity.User">
+        select id, username, password, real_name, phone, dept_id,
+               status, create_time, update_time, del_flag
+        from sys_user
+        where username = #{username} and del_flag = 0
+    </select>
 
+    <!-- 新增用户（移除role_id，匹配sys_user表） -->
     <insert id="insert" parameterType="com.sme.entity.User" useGeneratedKeys="true" keyProperty="id">
-        insert into sys_user(username,password,real_name,phone,dept_id,role_id,status)
-        values(#{username},#{password},#{realName},#{phone},#{deptId},#{roleId},#{status})
+        insert into sys_user(
+            username, password, real_name, phone, dept_id, status
+        ) values(
+                    #{username}, #{password}, #{realName}, #{phone}, #{deptId}, #{status}
+                )
     </insert>
 
-    <!--    更新用户-->
+    <!-- 更新用户（移除role_id，匹配sys_user表） -->
     <update id="update" parameterType="com.sme.entity.User">
         update sys_user
         <set>
@@ -47,15 +75,21 @@
             <if test="realName != null">real_name = #{realName},</if>
             <if test="phone != null">phone = #{phone},</if>
             <if test="deptId != null">dept_id = #{deptId},</if>
-            <if test="roleId != null">role_id = #{roleId},</if>
             <if test="status != null">status = #{status},</if>
-
+            <if test="updateTime != null">update_time = #{updateTime},</if>
         </set>
-        where id = #{id}
+        where id = #{id} and del_flag = 0
     </update>
 
-    <!--    删除用户-->
+    <!-- 逻辑删除用户（推荐，替代物理删除） -->
+    <update id="deleteById" parameterType="long">
+        update sys_user set del_flag = 1 where id = #{id}
+    </update>
+
+    <!-- 如需物理删除，保留原语句（注释备用） -->
+    <!--
     <delete id="deleteById" parameterType="long">
         delete from sys_user where id = #{id}
     </delete>
+    -->
 </mapper>

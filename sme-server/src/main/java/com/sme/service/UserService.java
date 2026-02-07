@@ -44,4 +44,9 @@ public interface UserService {
      */
     Boolean deleteById(Long id);
 
+    /**
+     * 根据用户ID查询用户信息（包含角色信息）
+     */
+    User findUserWithRoleById(Long userId);
+
 }

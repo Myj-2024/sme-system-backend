@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class permission extends BaseEntity{
+public class Permission extends BaseEntity{
 
     /**
      * 权限名称

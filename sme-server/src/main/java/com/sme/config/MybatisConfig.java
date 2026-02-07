@@ -30,6 +30,9 @@ public class MybatisConfig implements WebMvcConfigurer {
     @Autowired
     private JwtInterceptor jwtInterceptor;
 
+    @Autowired
+    private PermissionInterceptor permissionInterceptor;
+
 
     /**
      * 添加 JWT 拦截器
@@ -43,6 +46,12 @@ public class MybatisConfig implements WebMvcConfigurer {
                 .addPathPatterns("/admin/**")
                 // 排除登录接口
                 .excludePathPatterns("/admin/auth/login");
+
+        // 添加权限拦截器
+        registry.addInterceptor(permissionInterceptor)
+                // 拦截所有请求路径
+                //注意：拦截器执行顺序按照添加顺序执行，添加的越早越先执行
+                .addPathPatterns("/admin/**");
     }
 
 }
