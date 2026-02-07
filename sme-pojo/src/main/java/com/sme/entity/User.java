@@ -1,18 +1,19 @@
 package com.sme.entity;
 
 import com.sme.constant.StatusConstant;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
 
 import java.io.Serializable;
+import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements Serializable {
+@Schema(description = "用户实体类",name = "User")
+public class User extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -50,5 +51,7 @@ public class User implements Serializable {
      * 状态：0-禁用 / 1-启用
      */
     private Integer status = StatusConstant.ENABLE;
+
+    private List<Role> roles;
 
 }

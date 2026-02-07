@@ -1,5 +1,4 @@
-# ===================== 核心：忽略编译/构建目录（适配多模块） =====================
-# 忽略所有层级的target目录（覆盖sme-common/target、sme-pojo/target等）
+# 忽略所有层级的target目录
 **/target/
 # 忽略其他构建目录（NetBeans/Gradle）
 **/build/

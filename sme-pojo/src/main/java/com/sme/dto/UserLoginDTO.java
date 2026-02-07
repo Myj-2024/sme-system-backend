@@ -7,7 +7,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-@Schema(description = "用户登录参数")
+@Schema(description = "用户登录参数", name = "UserLoginDTO")
 public class UserLoginDTO implements Serializable {
 
     @Schema(description = "用户账号")

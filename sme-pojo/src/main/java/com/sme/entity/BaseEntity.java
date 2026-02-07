@@ -2,13 +2,18 @@ package com.sme.entity;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 基础实体类
  */
 @Data
-public class BaseEntity {
+public class BaseEntity implements Serializable {
+    /**
+     * 序列化ID
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * 主键ID（自增）

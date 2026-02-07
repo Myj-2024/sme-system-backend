@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sme.mapper.UserMapper">
+
+<!--    结果映射-->
+
+    <resultMap id="UserResultMap" type="com.sme.entity.User">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="real_name" property="realName" />
+        <result column="phone" property="phone" />
+        <result column="dept_id" property="deptId" />
+        <result column="role_id" property="roleId" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+<!--    查询用户列表-->
+    <select id="findAll" resultMap="UserResultMap">
+        select * from sys_user
+    </select>
+
+<!--    根据ID查询用户信息-->
+    <select id="findById" parameterType="long" resultMap="UserResultMap">
+        select * from sys_user where id = #{id}
+    </select>
+<!--    根据用户名查询用户信息-->
+    <select id="findByUserName" parameterType="string"  resultType="com.sme.entity.User">
+        select * from sys_user where username = #{username}
+    </select>
+
+    <!--    新增用户-->
+
+    <insert id="insert" parameterType="com.sme.entity.User" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_user(username,password,real_name,phone,dept_id,role_id,status)
+        values(#{username},#{password},#{realName},#{phone},#{deptId},#{roleId},#{status})
+    </insert>
+
+    <!--    更新用户-->
+    <update id="update" parameterType="com.sme.entity.User">
+        update sys_user
+        <set>
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="realName != null">real_name = #{realName},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="roleId != null">role_id = #{roleId},</if>
+            <if test="status != null">status = #{status},</if>
+
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--    删除用户-->
+    <delete id="deleteById" parameterType="long">
+        delete from sys_user where id = #{id}
+    </delete>
+</mapper>
