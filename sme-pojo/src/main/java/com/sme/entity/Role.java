@@ -4,14 +4,35 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.security.Permission;
+import java.util.Date;
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
+
 @Data
 
-public class Role extends BaseEntity{
+public class Role{
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 主键ID（自增）
+     */
+    private Long id;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+
+    /**
+     * 逻辑删除：0-未删 / 1-已删
+     */
+    private Byte delFlag = 0;
 
     /**
      * 角色名称

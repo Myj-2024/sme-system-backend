@@ -5,17 +5,23 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "用户实体类",name = "User")
-public class User extends BaseEntity implements Serializable {
+public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+
+    /**
+     * 主键ID（自增）
+     */
+    private Long id;
 
     /**
      * 用户账号（登录用）
@@ -51,6 +57,21 @@ public class User extends BaseEntity implements Serializable {
      * 状态：0-禁用 / 1-启用
      */
     private Integer status = StatusConstant.ENABLE;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+
+    /**
+     * 逻辑删除：0-未删 / 1-已删
+     */
+    private Byte delFlag = 0;
 
     private List<Role> roles;
 

@@ -49,4 +49,8 @@ public interface UserService {
      */
     User findUserWithRoleById(Long userId);
 
+    /**
+     * 修改用户状态
+     */
+    void updateUserStatus(Integer status, Long id);
 }

@@ -41,7 +41,7 @@
           AND (r.del_flag = 0 OR r.del_flag IS NULL)
     </select>
 
-    <!-- 根据ID查询用户（无role_id） -->
+    <!-- 根据ID查询用户 -->
     <select id="findById" parameterType="long" resultMap="UserResultMap">
         select id, username, password, real_name, phone, dept_id,
                status, create_time, update_time, del_flag
@@ -49,7 +49,7 @@
         where id = #{id} and del_flag = 0
     </select>
 
-    <!-- 根据用户名查询用户（无role_id） -->
+    <!-- 根据用户名查询用户-->
     <select id="findByUserName" parameterType="string" resultType="com.sme.entity.User">
         select id, username, password, real_name, phone, dept_id,
                status, create_time, update_time, del_flag

@@ -21,9 +21,6 @@ public enum ResultCode {
     USER_DISABLED(1004, "用户被禁用");
 
 
-
-
-
     private Integer code;
     private String message;
 

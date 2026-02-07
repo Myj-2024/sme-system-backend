@@ -3,9 +3,31 @@ package com.sme.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@EqualsAndHashCode(callSuper = true)
+import java.util.Date;
+
+
 @Data
-public class Permission extends BaseEntity{
+public class Permission{
+
+    /**
+     * 主键ID（自增）
+     */
+    private Long id;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+
+    /**
+     * 逻辑删除：0-未删 / 1-已删
+     */
+    private Byte delFlag = 0;
 
     /**
      * 权限名称

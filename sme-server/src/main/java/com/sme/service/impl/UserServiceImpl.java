@@ -7,6 +7,7 @@ import com.sme.mapper.RoleMapper;
 import com.sme.mapper.UserMapper;
 import com.sme.service.UserService;
 import com.sme.utils.JwtUtil;
+import com.sme.utils.UserContext;
 import com.sme.vo.UserLoginVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 
 /**
  * 用户服务实现类（修复版）
@@ -51,6 +53,11 @@ public class UserServiceImpl implements UserService {
         return userMapper.findByUserName(username);
     }
 
+    /**
+     *新增 用户
+     * @param user
+     * @return
+     */
     @Override
     public Boolean insert(User user) {
         try {
@@ -70,6 +77,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * 修改用户
+     * @param user
+     * @return
+     */
     @Override
     public Boolean update(User user) {
         try {
@@ -87,6 +99,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * 删除用户
+     * @param id
+     * @return
+     */
     @Override
     public Boolean deleteById(Long id) {
         try {
@@ -116,6 +133,30 @@ public class UserServiceImpl implements UserService {
             user.setRoles(roleMapper.findRolesByUserId(userId));
         }
         return user;
+    }
+
+    /**
+     * 修改用户状态
+     *
+     * @param status
+     * @param id
+     */
+    @Override
+    public void updateUserStatus(Integer status, Long id) {
+        // 1. 获取当前登录用户的ID
+        Long currentUserId = UserContext.getUserId();
+
+        // 2. 校验：禁止操作自己的状态
+        if (currentUserId != null && currentUserId.equals(id)) {
+            throw new BaseException("不允许修改当前登录用户自身的状态！");
+        }
+
+        // 3. 原有逻辑
+        User user = User.builder()
+                .status(status)
+                .id(id)
+                .build();
+        userMapper.update(user);
     }
 
     @Override
