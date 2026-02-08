@@ -47,4 +47,12 @@ public class GlobalExceptionHandler {
         e.printStackTrace();
         return Result.error("系统内部错误");
     }
+
+    /**
+     * 处理部门新增的字典校验异常
+     */
+    @ExceptionHandler(RuntimeException.class)
+    public Result<String> handleRuntimeException(RuntimeException e) {
+        return Result.error(e.getMessage());
+    }
 }

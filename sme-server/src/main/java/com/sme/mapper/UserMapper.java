@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 @Mapper
-public interface UserMapper extends BaseMapper<User>{
+public interface UserMapper{
 
     /**
      * 查询用户列表信息

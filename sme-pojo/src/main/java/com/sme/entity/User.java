@@ -49,6 +49,11 @@ public class User implements Serializable {
     private Long deptId;
 
     /**
+     * 部门名称
+     */
+    private String deptName;
+
+    /**
      * 角色ID（关联角色表，可扩展sys_role）
      */
     private Long roleId = 0L;

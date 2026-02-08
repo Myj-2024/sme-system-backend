@@ -13,4 +13,5 @@ public class MessageConstant {
     public static final String USER_UPDATE_ERROR = "修改用户失败";
     public static final String USER_DELETE_ERROR = "删除用户失败";
     public static final String USER_STATUS_ERROR = "用户状态只能是0（禁用）或1（启用）";
+    public static final String DEPT_INSERT_ERROR = "新增部门失败";
 }
