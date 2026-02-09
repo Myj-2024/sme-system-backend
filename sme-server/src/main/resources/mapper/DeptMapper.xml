@@ -1,29 +1,137 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.sme.mapper.DeptMapper">
 
-    <!-- 基础结果映射 -->
+    <!-- ==================== ResultMap ==================== -->
     <resultMap id="DeptResultMap" type="com.sme.entity.Dept">
-        <id column="id" property="id" />
-        <result column="dept_name" property="deptName" />
-        <result column="dept_code" property="deptCode" />
-        <result column="parent_id" property="parentId" />
-        <result column="phone" property="phone" />
-        <result column="position" property="position" />
-        <result column="leader" property="leader" />
-        <result column="status" property="status" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
-        <result column="del_flag" property="delFlag" />
+        <id     column="id"           property="id"/>
+        <result column="dept_name"    property="deptName"/>
+        <result column="dept_code"    property="deptCode"/>
+        <result column="parent_id"    property="parentId"/>
+        <result column="leader"       property="leader"/>
+        <result column="phone"        property="phone"/>
+        <result column="position"     property="position"/>
+        <result column="status"       property="status"/>
+        <result column="create_time"  property="createTime"/>
+        <result column="update_time"  property="updateTime"/>
+        <result column="del_flag"     property="delFlag"/>
     </resultMap>
-    <insert id="insertDept">
-        insert into sys_dept(dept_name,dept_code,parent_id,phone,leader,position,status,create_time,update_time,del_flag)
-        values(#{deptName},#{deptCode},#{parentId},#{phone},#{leader},#{position},#{status},#{createTime},#{updateTime},#{delFlag})
+
+    <!-- ==================== 新增 ==================== -->
+    <insert id="insertDept"
+            parameterType="com.sme.entity.Dept"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO sys_dept (
+            dept_name,
+            dept_code,
+            parent_id,
+            leader,
+            phone,
+            position,
+            status,
+            del_flag
+        ) VALUES (
+                     #{deptName},
+                     #{deptCode},
+                     #{parentId},
+                     #{leader},
+                     #{phone},
+                     #{position},
+                     #{status},
+                     0
+                 )
     </insert>
 
-    <!-- 修改：按删除状态查询，只返回未删除的部门 -->
-    <select id="findAllByDelFlag" resultMap="DeptResultMap">
-        select * from sys_dept where del_flag = #{delFlag}
+    <!-- ==================== 根据ID查询 ==================== -->
+    <select id="selectById" resultMap="DeptResultMap">
+        SELECT
+            id, dept_name, dept_code, parent_id,
+            leader, phone, position,
+            status, create_time, update_time, del_flag
+        FROM sys_dept
+        WHERE id = #{id}
     </select>
+
+    <!-- ==================== 查询全部（未删除） ==================== -->
+    <select id="selectList" resultMap="DeptResultMap">
+        SELECT
+            id, dept_name, dept_code, parent_id,
+            leader, phone, position,
+            status, create_time, update_time, del_flag
+        FROM sys_dept
+        WHERE del_flag = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- ==================== 分页查询 ==================== -->
+    <select id="selectPage" resultMap="DeptResultMap">
+        SELECT
+        id, dept_name, dept_code, parent_id,
+        leader, phone, position,
+        status, create_time, update_time, del_flag
+        FROM sys_dept
+        WHERE del_flag = 0
+        <if test="deptName != null and deptName != ''">
+            AND dept_name LIKE CONCAT('%', #{deptName}, '%')
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- ==================== 修改 ==================== -->
+    <update id="updateDept" parameterType="com.sme.entity.Dept">
+        UPDATE sys_dept
+        <set>
+            <if test="deptName != null">dept_name = #{deptName},</if>
+            <if test="deptCode != null">dept_code = #{deptCode},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="leader != null">leader = #{leader},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="position != null">position = #{position},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- ==================== 物理删除 ==================== -->
+    <delete id="deleteById">
+        DELETE FROM sys_dept WHERE id = #{id}
+    </delete>
+
+    <!-- ==================== 批量物理删除 ==================== -->
+    <delete id="deleteBatch">
+        DELETE FROM sys_dept
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- ==================== 校验部门编码唯一 ==================== -->
+    <select id="countByDeptCode" resultType="int">
+        SELECT COUNT(1)
+        FROM sys_dept
+        WHERE dept_code = #{deptCode}
+        <if test="id != null">
+            AND id != #{id}
+        </if>
+    </select>
+
+
+    <!-- ==================== 修改状态 ==================== -->
+    <update id="updateStatus">
+        UPDATE sys_dept
+        SET status = #{status},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
 
 </mapper>

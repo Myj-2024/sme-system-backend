@@ -1,6 +1,7 @@
 package com.sme.service.impl;
 
-import com.sme.entity.Permission;
+import com.sme.entity.SysPermission;
+import com.sme.entity.SysPermission;
 import com.sme.mapper.PermissionMapper;
 import com.sme.service.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class PermissionServiceImpl implements PermissionService {
      * @return
      */
     @Override
-    public List<Permission> findPermissionsByRoleId(Long roleId) {
+    public List<SysPermission> findPermissionsByRoleId(Long roleId) {
         return permissionMapper.findPermissionsByRoleId(roleId);
     }
 
@@ -31,7 +32,7 @@ public class PermissionServiceImpl implements PermissionService {
      * @return
      */
     @Override
-    public List<Permission> findPermissionsByUserId(Long userId) {
+    public List<SysPermission> findPermissionsByUserId(Long userId) {
         return permissionMapper.findPermissionsByUserId(userId);
     }
 
@@ -41,7 +42,7 @@ public class PermissionServiceImpl implements PermissionService {
      * @return
      */
     @Override
-    public Permission findByCode(String code) {
+    public SysPermission findByCode(String code) {
         return permissionMapper.findByCode( code);
     }
 
@@ -53,7 +54,7 @@ public class PermissionServiceImpl implements PermissionService {
      */
     @Override
     public Boolean hasPermission(Long userId, String permissionCode) {
-        List<Permission> permissions = permissionMapper.findPermissionsByUserId(userId);
+        List<SysPermission> permissions = permissionMapper.findPermissionsByUserId(userId);
         return permissions.stream()
                 .anyMatch(permission -> permission.getCode().equals(permissionCode));
     }

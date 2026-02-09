@@ -4,7 +4,7 @@
 
     <!--    结果映射-->
 
-    <resultMap id="PermissionResultMap" type="com.sme.entity.Permission">
+    <resultMap id="PermissionResultMap" type="com.sme.entity.SysPermission">
         <id column="id" property="id" />
         <result column="name" property="name" />
         <result column="code" property="code" />
@@ -31,7 +31,7 @@
     </select>
 
 
-    <select id="findByCode" resultType="com.sme.entity.Permission">
+    <select id="findByCode" resultType="com.sme.entity.SysPermission">
             select * from sys_permission where code = #{code} and status = 1
     </select>
 

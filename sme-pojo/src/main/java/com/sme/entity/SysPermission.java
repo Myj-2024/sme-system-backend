@@ -7,7 +7,7 @@ import java.util.Date;
 
 
 @Data
-public class Permission{
+public class SysPermission{
 
     /**
      * 主键ID（自增）

@@ -6,13 +6,18 @@ import java.util.List;
 
 public interface DeptService {
 
-    /**
-     * 查询所有部门
-     */
     List<Dept> findAllDepts();
 
-    /**
-     * 新增部门
-     */
-    boolean insertDept(Dept dept);
+    void insertDept(Dept dept);
+
+    void updateDept(Dept dept);
+
+    void deleteDept(Long id);
+
+    Dept getById(Long id);
+
+    void updateStatus(Long id, Integer status);
+
+
+    List<Dept> page(String deptName, Integer status);
 }
