@@ -3,7 +3,9 @@ package com.sme.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 @Data
@@ -75,4 +77,9 @@ public class SysPermission{
      * 0:禁用 1:正常
      */
     private Byte status;
+
+    /**
+     * 子权限列表 (非数据库字段)
+     */
+    private List<SysPermission> children = new ArrayList<>();
 }

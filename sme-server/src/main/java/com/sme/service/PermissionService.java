@@ -11,29 +11,29 @@ import java.util.List;
  */
 public interface PermissionService {
 
-    /**
-     * 根据角色ID查询权限列表
-     * @param roleId
-     * @return
-     */
-    List<SysPermission> findPermissionsByRoleId(@Param("roleId") Long roleId);
+    List<SysPermission> findPermissionsByRoleId(Long roleId);
+
+    List<SysPermission> findPermissionsByUserId(Long userId);
+
+    SysPermission findByCode(String code);
+
+    Boolean hasPermission(Long userId, String permissionCode);
+
+    void createPermission(SysPermission permission);
+
+    void updatePermission(SysPermission permission);
+
+    void deletePermission(Long id);
+
+    List<SysPermission> findAll();
 
     /**
-     * 根据用户ID查询权限列表
-     * @param userId
-     * @return
+     * 获取当前用户的动态菜单树
      */
-    List<SysPermission> findPermissionsByUserId(@Param("userId") Long userId);
+    List<SysPermission> findUserMenuTree(Long userId);
 
     /**
-     * 根据权限编码查询权限信息
-     * @param code
-     * @return
+     * 获取当前用户的权限标识集合
      */
-    SysPermission findByCode(@Param("code") String code);
-
-    /**
-     * 检查用户是否有某个权限
-     */
-    Boolean hasPermission(@Param("userId") Long userId, @Param("permissionCode") String permissionCode);
+    List<String> findUserPermissionCodes(Long userId);
 }

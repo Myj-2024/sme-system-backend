@@ -31,6 +31,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 放行登录接口
                         .requestMatchers("/admin/auth/login").permitAll()
+
+
                         // 放行 Swagger 文档接口（如果需要）
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/readme.html").permitAll()
                         // 其他所有请求都允许（实际认证由 JWT 拦截器处理）

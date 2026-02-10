@@ -5,6 +5,7 @@ import com.sme.entity.User;
 import com.sme.exception.BaseException;
 import com.sme.mapper.RoleMapper;
 import com.sme.mapper.UserMapper;
+import com.sme.mapper.UserRoleMapper;
 import com.sme.service.UserService;
 import com.sme.utils.JwtUtil;
 import com.sme.utils.UserContext;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -33,6 +35,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserRoleMapper userRoleMapper;
 
     // 修复：注入实例化的JwtUtil（不再静态调用）
     @Autowired
@@ -157,6 +162,23 @@ public class UserServiceImpl implements UserService {
                 .id(id)
                 .build();
         userMapper.update(user);
+    }
+
+    @Override
+    public List<Long> getRoleIdsByUserId(Long userId) {
+        return userRoleMapper.findRoleIdsByUserId(userId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class) // 开启事务
+    public void assignRoles(Long userId, List<Long> roleIds) {
+        // 1. 先删除该用户旧的所有角色关联
+        userRoleMapper.deleteByUserId(userId);
+
+        // 2. 如果前端传来的角色列表不为空，则批量插入新关联
+        if (roleIds != null && !roleIds.isEmpty()) {
+            userRoleMapper.batchInsert(userId, roleIds);
+        }
     }
 
     @Override

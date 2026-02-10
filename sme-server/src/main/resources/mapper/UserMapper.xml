@@ -21,8 +21,8 @@
     <resultMap id="UserWithRolesResultMap" type="com.sme.entity.User" extends="UserResultMap">
         <collection property="roles" ofType="com.sme.entity.Role">
             <id column="r_id" property="id"/>
-            <result column="r_role_name" property="name"/>
-            <result column="r_role_code" property="code"/>
+            <result column="r_role_name" property="roleName"/>
+            <result column="r_role_code" property="roleCode"/>
             <result column="r_description" property="description"/>
             <result column="r_status" property="status"/>
         </collection>

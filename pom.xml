@@ -109,6 +109,21 @@
                 <optional>true</optional>
             </dependency>
 
+                <!-- AspectJ runtime -->
+                <dependency>
+                    <groupId>org.aspectj</groupId>
+                    <artifactId>aspectjrt</artifactId>
+                    <version>1.9.22</version> <!-- 可替换为最新版本 -->
+                </dependency>
+
+                <!-- AspectJ weaver（可选，如果使用编译时织入） -->
+                <dependency>
+                    <groupId>org.aspectj</groupId>
+                    <artifactId>aspectjweaver</artifactId>
+                    <version>1.9.22</version>
+                </dependency>
+
+
         </dependencies>
     </dependencyManagement>
 </project>

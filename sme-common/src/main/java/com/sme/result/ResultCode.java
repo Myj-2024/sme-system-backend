@@ -18,7 +18,8 @@ public enum ResultCode {
     USER_NOT_EXIST(1001, "用户不存在"),
     USER_ALREADY_EXIST(1002, "用户已存在"),
     USERNAME_OR_PASSWORD_ERROR(1003, "用户名或密码错误"),
-    USER_DISABLED(1004, "用户被禁用");
+    USER_DISABLED(1004, "用户被禁用"),
+    NO_PERMISSION(1005, "无权限访问" );
 
 
     private Integer code;

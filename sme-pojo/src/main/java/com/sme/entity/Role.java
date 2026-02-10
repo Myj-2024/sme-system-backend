@@ -37,13 +37,12 @@ public class Role{
     /**
      * 角色名称
      */
-    private String name;
+    private String roleName;
 
     /**
      * 角色编码
      */
-
-    private String code;
+    private String roleCode;
     /**
      * 描述
      */

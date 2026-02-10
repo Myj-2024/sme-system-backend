@@ -1,9 +1,8 @@
-package com.sme.config;
+package com.sme.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sme.result.Result;
 import com.sme.service.PermissionService;
-import com.sme.service.UserService;
 import com.sme.utils.UserContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+import com.sme.annotation.RequirePermission;
 
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
@@ -43,10 +43,10 @@ public class PermissionInterceptor implements HandlerInterceptor {
         Method method = handlerMethod.getMethod();
 
         //首先检查方法上是否有权限注解
-        RequiresPermission requiresPermission = method.getAnnotation(RequiresPermission.class);
+        RequirePermission requiresPermission = method.getAnnotation(RequirePermission.class);
         if (requiresPermission == null) {
             //如果该方法上没有这个权限注解，再检查类级别是否有权限注解
-            requiresPermission = handlerMethod.getBeanType().getAnnotation(RequiresPermission.class);
+            requiresPermission = handlerMethod.getBeanType().getAnnotation(RequirePermission.class);
         }
 
         //如果没有权限注解，则直接通过
@@ -62,7 +62,7 @@ public class PermissionInterceptor implements HandlerInterceptor {
     }
         //获取注解中定义的所需权限编码数组
         String[] permissions = requiresPermission.value();
-        
+
         //检查用户是否拥有所需权限
         for (String permission : permissions) {
             if (permissionService.hasPermission(userId, permission)){

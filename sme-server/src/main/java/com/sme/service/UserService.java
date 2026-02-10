@@ -53,4 +53,18 @@ public interface UserService {
      * 修改用户状态
      */
     void updateUserStatus(Integer status, Long id);
+
+    /**
+     * 获取用户拥有的角色ID列表
+     * @param userId 用户ID
+     * @return 角色ID集合
+     */
+    List<Long> getRoleIdsByUserId(Long userId);
+
+    /**
+     * 为用户分配角色
+     * @param userId 用户ID
+     * @param roleIds 角色ID集合
+     */
+    void assignRoles(Long userId, List<Long> roleIds);
 }

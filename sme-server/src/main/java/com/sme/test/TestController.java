@@ -1,6 +1,5 @@
 package com.sme.test;
 
-import com.sme.config.RequiresPermission;
 import com.sme.entity.User;
 import com.sme.result.Result;
 import com.sme.service.UserService;
@@ -23,7 +22,6 @@ public class TestController {
      */
 
     @GetMapping("/selectUserList")
-    @RequiresPermission("sys:user:list")
     public Result<List<User>> selectUserList(){
         List<User> userList = userService.findAll();
         return Result.success(userList);

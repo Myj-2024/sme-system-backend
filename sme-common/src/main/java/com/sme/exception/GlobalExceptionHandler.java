@@ -13,46 +13,50 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     /**
-     *处理自定义业务异常
-     * 当抛出BaseException异常时，会进入此方法
-     * @param e 业务异常对象
-     * @return 统一响应结果
+     * 1. 处理自定义业务异常 (核心：支持 401/403/500 等各种业务状态)
      */
     @ExceptionHandler(BaseException.class)
     public Result<Void> handleBaseException(BaseException e){
-        log.error("异常信息：{}", e.getMessage());
-        return Result.error(e.getCode(),e.getMessage());
+        log.error("业务异常 [Code: {}]: {}", e.getCode(), e.getMessage());
+        // 假设 Result.error 支持传入 code 和 message
+        return Result.error(e.getCode(), e.getMessage());
     }
 
     /**
-     * 处理参数错误异常
-     * 当抛出IllegalAccessError异常时，会进入此方法
-     * @param e 参数错误异常对象
-     * @return 统一响应结果
+     * 2. 处理 Spring 框架级别的参数校验异常 (重要)
+     * 比如 @Valid 校验失败时抛出的 MethodArgumentNotValidException
      */
-    @ExceptionHandler(IllegalAccessError.class)
-    public Result<Void> handleBaseException(IllegalAccessError e){
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public Result<String> handleValidationException(org.springframework.web.bind.MethodArgumentNotValidException e) {
+        String message = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        log.warn("参数校验失败: {}", message);
+        return Result.badRequest(message);
+    }
+
+    /**
+     * 3. 处理非法参数异常
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public Result<Void> handleIllegalArgumentException(IllegalArgumentException e){
+        log.warn("非法参数: {}", e.getMessage());
         return Result.badRequest(e.getMessage());
     }
 
     /**
-     * 处理其他异常
-     * 最为异常处理的默认处理方式，确定所有异常都能被统一处理
-     * @param e 异常对象
-     * @return 返回500错误码的响应结果
-     */
-    @ExceptionHandler(Exception.class)
-    public Result<Void> handleException(Exception e){
-        //打印堆栈异常信息，便于调试和排查问题
-        e.printStackTrace();
-        return Result.error("系统内部错误");
-    }
-
-    /**
-     * 处理部门新增的字典校验异常
+     * 4. 处理运行时异常
      */
     @ExceptionHandler(RuntimeException.class)
     public Result<String> handleRuntimeException(RuntimeException e) {
+        log.error("运行时异常: ", e); // 运行时异常建议打印堆栈，方便排查 BUG
         return Result.error(e.getMessage());
+    }
+
+    /**
+     * 5. 兜底方案：处理系统级未知异常
+     */
+    @ExceptionHandler(Exception.class)
+    public Result<Void> handleException(Exception e){
+        log.error("【系统致命异常】: ", e);
+        return Result.error("服务器开小差了，请稍后再试");
     }
 }

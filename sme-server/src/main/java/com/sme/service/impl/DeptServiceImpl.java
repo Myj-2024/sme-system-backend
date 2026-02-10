@@ -21,11 +21,19 @@ public class DeptServiceImpl implements DeptService {
     @Autowired
     private DictItemService dictItemService;
 
+    /**
+     * 查询全部部门
+     * @return
+     */
     @Override
     public List<Dept> findAllDepts() {
         return deptMapper.selectList();
     }
 
+    /**
+     * 新增部门
+     * @param dept
+     */
     @Override
     @Transactional
     public void insertDept(Dept dept) {
@@ -35,6 +43,10 @@ public class DeptServiceImpl implements DeptService {
         deptMapper.insertDept(dept);
     }
 
+    /**
+     * 修改部门
+     * @param dept
+     */
     @Override
     @Transactional
     public void updateDept(Dept dept) {
@@ -43,22 +55,41 @@ public class DeptServiceImpl implements DeptService {
         deptMapper.updateDept(dept);
     }
 
+    /**
+     * 删除部门
+     * @param id
+     */
     @Override
     @Transactional
     public void deleteDept(Long id) {
         deptMapper.deleteById(id);
     }
 
+    /**
+     * 根据ID查询部门
+     * @param id
+     * @return
+     */
     @Override
     public Dept getById(Long id) {
         return deptMapper.selectById(id);
     }
 
+    /**
+     * 分页查询部门
+     * @param deptName
+     * @param status
+     * @return
+     */
     @Override
     public List<Dept> page(String deptName, Integer status) {
         return deptMapper.selectPage(deptName, status);
     }
 
+    /**
+     * 填充部门编码
+     * @param dept
+     */
     private void fillDeptCode(Dept dept) {
         List<SysDictItemVO> list = dictItemService.selectItemsByDictCode("dept_type");
         SysDictItemVO item = list.stream()
@@ -68,6 +99,11 @@ public class DeptServiceImpl implements DeptService {
         dept.setDeptCode(item.getItemCode());
     }
 
+    /**
+     * 修改部门状态
+     * @param id
+     * @param status
+     */
     @Override
     @Transactional
     public void updateStatus(Long id, Integer status) {
