@@ -1,5 +1,7 @@
 package com.sme.mapper;
 
+import com.github.pagehelper.Page;
+import com.sme.dto.UserPageQueryDTO;
 import com.sme.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -37,4 +39,9 @@ public interface UserMapper{
      * 删除用户
      */
     Boolean deleteById(Long id);
+
+    /**
+     * 分页查询用户列表信息
+     */
+    Page<User> pageQuery(UserPageQueryDTO userPageQueryDTO);
 }

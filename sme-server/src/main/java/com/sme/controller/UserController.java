@@ -1,11 +1,14 @@
 package com.sme.controller;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.sme.constant.MessageConstant;
+import com.sme.dto.UserPageQueryDTO;
 import com.sme.entity.SysPermission;
 import com.sme.entity.User;
 import com.sme.exception.BaseException;
+import com.sme.result.PageResult;
 import com.sme.result.Result;
 import com.sme.result.ResultCode;
 import com.sme.service.PermissionService;
@@ -71,21 +74,17 @@ public class UserController {
 
     /**
      * 分页查询用户列表
-     * @param pageNum
-     * @param pageSize
+     *
      * @return
      */
     @GetMapping("/page")
     @Operation(summary = "分页查询", description = "分页查询用户列表")
     @RequirePermission("sys:user:list")
-    public Result<Map<String, Object>> getUserPage(
-            @Parameter(name = "pageNum", description = "页码", required = true) int pageNum,
-            @Parameter(name = "pageSize", description = "页大小", required = true) int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
-        List<User> users = userService.findAll();
-        PageInfo<User> pageInfo = new PageInfo<>(users);
-        Map<String, Object> pageResult = PageUtils.toPageResult(pageInfo);
-        return Result.success(pageResult);
+    public Result<PageResult> getUserPage(UserPageQueryDTO userPageQueryDTO) {
+            log.info("分页查询用户列表：{}", userPageQueryDTO);
+            PageResult page =userService.pageQuery(userPageQueryDTO);
+            PageResult pageResult = new PageResult(page.getTotal(), page.getRecords());
+            return Result.success(pageResult);
     }
 
     /**

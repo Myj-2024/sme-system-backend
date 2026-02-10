@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sme.mapper.DictItemMapper">
+
+    <resultMap id="SysDictItemResult" type="com.sme.vo.SysDictItemVO">
+        <id property="id" column="id"/>
+        <result property="dictId" column="dict_id"/>
+        <result property="itemCode" column="item_code"/>
+        <result property="itemName" column="item_name"/>
+        <result property="sort" column="sort"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <select id="countByDictId" resultType="int">
+        select count(1) from sys_dict_item
+        where dict_id = #{dictId} and del_flag = 0
+    </select>
+
+    <select id="selectItemsByDictCode" resultMap="SysDictItemResult">
+        SELECT i.id, i.dict_id, i.item_code, i.item_name, i.sort, i.status
+        FROM sys_dict_item i
+                 LEFT JOIN sys_dict d ON i.dict_id = d.id
+        WHERE d.dict_code = #{dictCode}
+          AND i.del_flag = 0
+          AND i.status = 1
+          AND d.del_flag = 0
+          AND d.status = 1
+        ORDER BY i.sort ASC
+    </select>
+
+    <select id="checkItemCodeUnique" resultType="int">
+        SELECT count(1) FROM sys_dict_item
+        WHERE dict_id = #{dictId} AND item_code = #{itemCode}
+        AND del_flag = 0
+        <if test="id != null"> AND id != #{id} </if>
+    </select>
+
+    <select id="selectItemList" resultMap="SysDictItemResult">
+        SELECT id, dict_id, item_code, item_name, sort, status
+        FROM sys_dict_item
+        <where>
+            del_flag = 0
+            <if test="dictId != null"> AND dict_id = #{dictId} </if>
+            <if test="itemName != null and itemName != ''">
+                AND item_name LIKE CONCAT('%', #{itemName}, '%')
+            </if>
+            <if test="status != null"> AND status = #{status} </if>
+        </where>
+        ORDER BY sort ASC
+    </select>
+
+    <select id="checkItemNameUnique" resultType="int">
+        SELECT count(1) FROM sys_dict_item
+        WHERE dict_id = #{dictId} AND item_name = #{itemName} AND del_flag = 0 LIMIT 1
+    </select>
+
+    <select id="checkItemUniqueOnUpdate" resultType="int">
+        SELECT count(1) FROM sys_dict_item
+        WHERE dict_id = #{dictId}
+          AND id != #{id}
+          AND (item_code = #{itemCode} OR item_name = #{itemName})
+          AND del_flag = 0
+    </select>
+
+    <insert id="insert" parameterType="com.sme.entity.SysDictItem">
+        INSERT INTO sys_dict_item (dict_id, item_code, item_name, sort, status, del_flag, create_time)
+        VALUES (#{dictId}, #{itemCode}, #{itemName}, #{sort}, #{status}, 0, NOW())
+    </insert>
+
+    <update id="update" parameterType="com.sme.entity.SysDictItem">
+        UPDATE sys_dict_item
+        <set>
+            <if test="itemCode != null and itemCode != ''">item_code = #{itemCode},</if>
+            <if test="itemName != null and itemName != ''">item_name = #{itemName},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteItemByIds">
+        DELETE FROM sys_dict_item
+        WHERE id IN
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

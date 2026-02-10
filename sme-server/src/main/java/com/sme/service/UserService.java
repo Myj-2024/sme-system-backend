@@ -1,7 +1,10 @@
 package com.sme.service;
 
+import com.github.pagehelper.Page;
 import com.sme.dto.UserLoginDTO;
+import com.sme.dto.UserPageQueryDTO;
 import com.sme.entity.User;
+import com.sme.result.PageResult;
 import com.sme.vo.UserLoginVO;
 
 import java.util.List;
@@ -67,4 +70,9 @@ public interface UserService {
      * @param roleIds 角色ID集合
      */
     void assignRoles(Long userId, List<Long> roleIds);
+
+    /**
+     * 分页查询用户列表
+     */
+    PageResult pageQuery(UserPageQueryDTO userPageQueryDTO);
 }

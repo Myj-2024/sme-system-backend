@@ -1,0 +1,64 @@
+package com.sme.mapper;
+
+import com.sme.entity.Enterprise;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+@Mapper
+public interface EnterpriseMapper {
+
+    /**
+     * 分页查询
+     * @param enterpriseName
+     * @param businessStatus
+     * @return
+     */
+     List<Enterprise> selectPage(@Param("enterpriseName") String enterpriseName,
+                                 @Param("businessStatus") String businessStatus,
+                                 @Param("enterpriseType") String enterpriseType,
+                                 @Param("townId") String townId,
+                                 @Param("industryId") String industryId
+                            );
+
+     /**
+     * 新增企业
+     * @param enterprise
+     */
+    void insertEnterprise(Enterprise enterprise);
+
+    /**
+     * 根据ID查询
+     * @param id
+     * @return
+     */
+    Enterprise selectById(Long id);
+
+    /**
+     * 修改企业
+     * @param enterprise
+     */
+    void updateEnterprise(Enterprise enterprise);
+
+    /**
+     * 删除（物理）
+     * @param id
+     */
+    void deleteById(Long id);
+
+    /**
+     * 批量物理删除
+     * @param ids
+     */
+    void deleteBatch(@Param("ids") List<Long> ids);
+
+    /**
+     * 修改企业状态
+     * @param id
+     * @param status
+     */
+    void updateStatus(
+           @Param("id") Long id,
+           @Param("status") Integer status);
+}

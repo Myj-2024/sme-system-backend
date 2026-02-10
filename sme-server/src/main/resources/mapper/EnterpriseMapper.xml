@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sme.mapper.EnterpriseMapper">
+
+    <resultMap id="EnterpriserResultMap" type="com.sme.entity.Enterprise">
+        <id column="id" property="id" />
+<!--        企业名称-->
+        <result column="enterprise_name" property="enterpriseName" />
+<!--        统一社会信用代码-->
+        <result column="credit_code" property="creditCode" />
+<!--        企业类型-->
+        <result column="enterprise_type" property="enterpriseType" />
+        <!--        联系电话-->
+        <result column="phone" property="phone" />
+<!--        注册地址-->
+        <result column="business_addr" property="businessAddr" />
+<!--        法定代表人-->
+        <result column="legal_person" property="legalPerson" />
+<!--        注册资本-->
+        <result column="reg_capital" property="regCapital" />
+<!--        成立时间-->
+        <result column="establish_time" property="establishTime" />
+<!--        所属乡镇-->
+        <result column="town_id" property="townId" />
+<!--        所属行业-->
+        <result column="industry_id" property="industryId" />
+        <!--        经营状态-->
+        <result column="business_status" property="businessStatus" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="del_flag" property="delFlag" />
+    </resultMap>
+
+<!--    新增企业-->
+    <insert id="insertEnterprise" parameterType="com.sme.entity.Enterprise" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sme_enterprise (
+            enterprise_name,
+            credit_code,
+            enterprise_type,
+            phone,
+            business_addr,
+            legal_person,
+            reg_capital,
+            establish_time,
+            town_id,
+            industry_id,
+            business_status,
+            del_flag
+        ) VALUES (
+            #{enterpriseName},
+            #{creditCode},
+            #{enterpriseType},
+            #{phone},
+            #{businessAddr},
+            #{legalPerson},
+            #{regCapital},
+            #{establishTime},
+            #{townId},
+            #{industryId},
+            #{businessStatus},
+            0
+        )
+    </insert>
+
+<!--    修改企业-->
+    <update id="updateEnterprise">
+        update sme_enterprise
+        <set>
+            <if test="enterpriseName != null">
+                enterprise_name = #{enterpriseName},
+            </if>
+            <if test="creditCode != null">
+                credit_code = #{creditCode},
+            </if>
+            <if test="enterpriseType != null">
+                enterprise_type = #{enterpriseType},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="businessAddr != null">
+                business_addr = #{businessAddr},
+            </if>
+            <if test="legalPerson != null">
+                legal_person = #{legalPerson},
+            </if>
+            <if test="regCapital != null">
+                reg_capital = #{regCapital},
+            </if>
+            <if test="establishTime != null">
+                establish_time = #{establishTime},
+            </if>
+            <if test="townId != null">
+                town_id = #{townId},
+            </if>
+            <if test="industryId != null">
+                industry_id = #{industryId},
+            </if>
+            <if test="businessStatus != null">
+                business_status = #{businessStatus},
+            </if>
+            update_time = now(),
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!--    修改企业状态-->
+    <update id="updateStatus">
+        UPDATE sme_enterprise
+        SET business_status = #{status}
+        WHERE id = #{id}
+    </update>
+    <!--    删除 企业（单个）-->
+    <delete id="deleteById">
+        DELETE FROM sme_enterprise
+        WHERE id = #{id}
+    </delete>
+
+<!--    删除 企业（批量）-->
+    <delete id="deleteBatch">
+        DELETE FROM sme_enterprise
+        WHERE id IN
+        <foreach item="id" collection="ids" separator="," close=")" open="(" index="">
+            #{id}
+        </foreach>
+        />
+    </delete>
+
+    <!--    分页查询-->
+    <select id="selectPage" resultMap="EnterpriserResultMap">
+        SELECT
+        id, enterprise_name, credit_code, enterprise_type,
+        phone, business_addr, legal_person, reg_capital,
+        establish_time, town_id, industry_id,
+        business_status, create_time, update_time, del_flag
+        FROM sme_enterprise
+        WHERE del_flag = 0
+        <if test="enterpriseName != null and enterpriseName != ''">
+            AND enterprise_name LIKE CONCAT('%', #{enterpriseName}, '%')
+        </if>
+        <if test="businessStatus != null">
+            AND business_status = #{businessStatus}
+        </if>
+        <if test="enterpriseType != null">
+            AND enterprise_type = #{enterpriseType}
+        </if>
+        <if test="townId != null">
+            AND town_id = #{townId}
+        </if>
+        <if test="industryId != null">
+            AND industry_id = #{industryId}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+<!--    根据ID查询-->
+    <select id="selectById" resultType="com.sme.entity.Enterprise">
+        SELECT
+        id, enterprise_name, credit_code, enterprise_type,
+        phone, business_addr, legal_person, reg_capital,
+        establish_time, town_id, industry_id,
+        business_status, create_time, update_time, del_flag
+        FROM sme_enterprise
+        WHERE id = #{id}
+    </select>
+
+</mapper>

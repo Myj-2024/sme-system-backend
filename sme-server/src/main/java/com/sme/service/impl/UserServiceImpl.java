@@ -1,11 +1,15 @@
 package com.sme.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sme.dto.UserLoginDTO;
+import com.sme.dto.UserPageQueryDTO;
 import com.sme.entity.User;
 import com.sme.exception.BaseException;
 import com.sme.mapper.RoleMapper;
 import com.sme.mapper.UserMapper;
 import com.sme.mapper.UserRoleMapper;
+import com.sme.result.PageResult;
 import com.sme.service.UserService;
 import com.sme.utils.JwtUtil;
 import com.sme.utils.UserContext;
@@ -179,6 +183,21 @@ public class UserServiceImpl implements UserService {
         if (roleIds != null && !roleIds.isEmpty()) {
             userRoleMapper.batchInsert(userId, roleIds);
         }
+    }
+
+    /**
+     * 分页查询用户
+     * @param userPageQueryDTO
+     * @return
+     */
+    @Override
+    public PageResult pageQuery(UserPageQueryDTO userPageQueryDTO) {
+
+        PageHelper.startPage(userPageQueryDTO.getPageNum(), userPageQueryDTO.getPageSize());
+
+        Page<User> page = userMapper.pageQuery(userPageQueryDTO);
+
+        return new PageResult(page.getTotal(), page.getResult());
     }
 
     @Override
