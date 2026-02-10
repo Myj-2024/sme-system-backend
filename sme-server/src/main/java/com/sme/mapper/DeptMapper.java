@@ -1,5 +1,7 @@
 package com.sme.mapper;
 
+import com.github.pagehelper.Page;
+import com.sme.dto.DeptPageQueryDTO;
 import com.sme.entity.Dept;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -19,8 +21,7 @@ public interface DeptMapper {
     List<Dept> selectList();
 
     /** 分页查询 */
-    List<Dept> selectPage(@Param("deptName") String deptName,
-                          @Param("status") Integer status);
+    Page<Dept> selectPage(DeptPageQueryDTO deptPageQueryDTO);
 
     /** 修改部门 */
     int updateDept(Dept dept);

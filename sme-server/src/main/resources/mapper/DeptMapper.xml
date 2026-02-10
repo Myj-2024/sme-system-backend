@@ -70,9 +70,7 @@
     <!-- ==================== 分页查询 ==================== -->
     <select id="selectPage" resultMap="DeptResultMap">
         SELECT
-        id, dept_name, dept_code, parent_id,
-        leader, phone, position,
-        status, create_time, update_time, del_flag
+        id, dept_name, leader, position,status,phone,dept_code
         FROM sys_dept
         WHERE del_flag = 0
         <if test="deptName != null and deptName != ''">
@@ -80,6 +78,18 @@
         </if>
         <if test="status != null">
             AND status = #{status}
+        </if>
+        <if test="leader != null and leader != ''" >
+            AND leader LIKE CONCAT('%', #{leader}, '%')
+        </if>
+        <if test="position != null and position != ''" >
+            AND position LIKE CONCAT('%', #{position}, '%')
+        </if>
+        <if test="deptCode != null and deptCode != ''" >
+            AND dept_code LIKE CONCAT('%', #{deptCode}, '%')
+        </if>
+        <if test="phone != null and phone != ''" >
+            AND phone LIKE CONCAT('%', #{phone}, '%')
         </if>
         ORDER BY create_time DESC
     </select>

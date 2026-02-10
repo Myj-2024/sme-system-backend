@@ -1,6 +1,8 @@
 package com.sme.service;
 
+import com.sme.dto.DeptPageQueryDTO;
 import com.sme.entity.Dept;
+import com.sme.result.PageResult;
 
 import java.util.List;
 
@@ -19,5 +21,5 @@ public interface DeptService {
     void updateStatus(Long id, Integer status);
 
 
-    List<Dept> page(String deptName, Integer status);
+   PageResult page(DeptPageQueryDTO deptPageQueryDTO);
 }

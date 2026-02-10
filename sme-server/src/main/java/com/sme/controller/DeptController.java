@@ -1,14 +1,18 @@
 package com.sme.controller;
 
+import com.sme.dto.DeptPageQueryDTO;
 import com.sme.entity.Dept;
+import com.sme.result.PageResult;
 import com.sme.result.Result;
 import com.sme.service.DeptService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/admin/dept")
 @Tag(name = "部门管理")
@@ -25,10 +29,11 @@ public class DeptController {
 
     /** 分页 / 条件查询 */
     @GetMapping("/page")
-    public Result<List<Dept>> page(
-            @RequestParam(required = false) String deptName,
-            @RequestParam(required = false) Integer status) {
-        return Result.success(deptService.page(deptName, status));
+    public Result<PageResult> page(DeptPageQueryDTO deptPageQueryDTO) {
+        log.info("分页查询参数：{}", deptPageQueryDTO);
+        PageResult  page = deptService.page(deptPageQueryDTO);
+        PageResult pageResult = new PageResult(page.getTotal(), page.getRecords());
+        return Result.success(pageResult);
     }
 
     /** 详情 */

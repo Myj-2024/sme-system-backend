@@ -1,7 +1,11 @@
 package com.sme.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.sme.dto.DeptPageQueryDTO;
 import com.sme.entity.Dept;
 import com.sme.mapper.DeptMapper;
+import com.sme.result.PageResult;
 import com.sme.service.DeptService;
 import com.sme.service.DictItemService;
 import com.sme.vo.SysDictItemVO;
@@ -77,13 +81,14 @@ public class DeptServiceImpl implements DeptService {
 
     /**
      * 分页查询部门
-     * @param deptName
-     * @param status
+
      * @return
      */
     @Override
-    public List<Dept> page(String deptName, Integer status) {
-        return deptMapper.selectPage(deptName, status);
+    public PageResult page(DeptPageQueryDTO deptPageQueryDTO) {
+        PageHelper.startPage(deptPageQueryDTO.getPageNum(), deptPageQueryDTO.getPageSize());
+        Page<Dept> page = deptMapper.selectPage(deptPageQueryDTO);
+        return new PageResult(page.getTotal(), page.getResult());
     }
 
     /**
