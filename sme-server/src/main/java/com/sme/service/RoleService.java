@@ -1,13 +1,15 @@
 package com.sme.service;
 
 import com.sme.dto.RoleDTO;
+import com.sme.dto.RolePageQueryDTO;
 import com.sme.entity.Role;
+import com.sme.result.PageResult;
 
 import java.util.List;
 
 public interface RoleService {
 
-    List<Role> findRolesByUserId(Long userId);
+    PageResult findRolesByUserId(RolePageQueryDTO rolePageQueryDTO);
 
     Role findById(Long id);
 

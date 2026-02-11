@@ -3,9 +3,11 @@ package com.sme.controller;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.sme.constant.MessageConstant;
+import com.sme.dto.DictPageQueryDTO;
 import com.sme.dto.SysDictDTO;
 import com.sme.entity.SysDict;
 import com.sme.exception.BaseException;
+import com.sme.result.PageResult;
 import com.sme.result.Result;
 import com.sme.service.DictService;
 import com.sme.utils.PageUtils;
@@ -34,14 +36,10 @@ public class DictController {
      */
     @GetMapping("/list")
     @Operation(summary = "分页查询", description = "分页查询字典列表")
-    public Result<Map<String, Object>> list(
-            @Parameter(name = "pageNum", description = "页码", required = true) int pageNum,
-            @Parameter(name = "pageSize", description = "页大小", required = true) int pageSize) {
-
-        PageHelper.startPage(pageNum, pageSize);
-        List<SysDict> dictList = dictService.selectDictList();
-        PageInfo<SysDict> pageInfo = new PageInfo<>(dictList);
-        Map<String, Object> pageResult = PageUtils.toPageResult(pageInfo);
+    public Result<PageResult> page(DictPageQueryDTO dictPageQueryDTO){
+        log.info("分页查询参数：{}", dictPageQueryDTO);
+        PageResult page = dictService.selectDictList(dictPageQueryDTO);
+        PageResult pageResult = new PageResult(page.getTotal(), page.getRecords());
         return Result.success(pageResult);
     }
 

@@ -3,12 +3,15 @@ package com.sme.controller;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.sme.dto.SysDictItemDTO;
+import com.sme.dto.SysDictItemPageQueryDTO;
+import com.sme.result.PageResult;
 import com.sme.result.Result;
 import com.sme.service.DictItemService;
 import com.sme.utils.PageUtils;
 import com.sme.vo.SysDictItemVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/admin/dict/item")
 @Tag(name = "字典项管理接口")
@@ -29,12 +33,11 @@ public class DictItemController {
      */
     @GetMapping("/list")
     @Operation(summary = "分页查询字典项")
-    public Result<Map<String, Object>> list(SysDictItemVO itemVO,
-                                            @RequestParam int pageNum,
-                                            @RequestParam int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
-        List<SysDictItemVO> list = itemService.selectItemList(itemVO);
-        return Result.success(PageUtils.toPageResult(new PageInfo<>(list)));
+    public Result<PageResult> page(SysDictItemPageQueryDTO  sysDictItemPageQueryDTO){
+        log.info("分页查询字典项列表");
+        PageHelper.startPage((sysDictItemPageQueryDTO));
+        PageResult pageResult = itemService.selectItemList(sysDictItemPageQueryDTO);
+        return Result.success(pageResult);
     }
 
     /**

@@ -1,9 +1,14 @@
 package com.sme.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.sme.dto.DictPageQueryDTO;
 import com.sme.dto.SysDictDTO;
 import com.sme.entity.SysDict;
+import com.sme.entity.User;
 import com.sme.mapper.DictItemMapper;
 import com.sme.mapper.DictMapper;
+import com.sme.result.PageResult;
 import com.sme.result.Result;
 import com.sme.service.DictService;
 import org.springframework.beans.BeanUtils;
@@ -22,9 +27,13 @@ public class DictServiceImpl implements DictService {
     @Autowired
     private DictItemMapper dictItemMapper;
 
+
     @Override
-    public List<SysDict> selectDictList() {
-        return dictMapper.selectDictList();
+    public PageResult selectDictList(DictPageQueryDTO dictPageQueryDTO) {
+        PageHelper.startPage(dictPageQueryDTO.getPageNum(), dictPageQueryDTO.getPageSize());
+        Page<SysDict> page  = dictMapper.selectDictList(dictPageQueryDTO);
+        return new PageResult(page.getTotal(), page.getResult());
+
     }
 
     @Override

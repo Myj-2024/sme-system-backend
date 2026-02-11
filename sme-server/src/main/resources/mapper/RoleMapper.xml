@@ -3,7 +3,6 @@
 <mapper namespace="com.sme.mapper.RoleMapper">
 
     <!--    结果映射-->
-
     <resultMap id="RoleResultMap" type="com.sme.entity.Role">
         <id column="id" property="id" />
         <result column="role_name" property="roleName" />
@@ -14,20 +13,24 @@
         <result column="update_time" property="updateTime" />
     </resultMap>
 
-        <select id="findRolesByUserId" parameterType="long" resultMap="RoleResultMap">
-            select r.* from sys_role r
-                                inner join user_role ur on r.id = ur.role_id
-            where ur.user_id = #{userId} and r.status = 1
-        </select>
+    <!-- 根据用户ID查询关联角色（仅查启用状态） -->
+    <select id="findRolesByUserId" parameterType="long" resultMap="RoleResultMap">
+        select r.* from sys_role r
+                            inner join user_role ur on r.id = ur.role_id
+        where ur.user_id = #{userId} and r.status = 1
+    </select>
 
-        <select id="findById" parameterType="long" resultMap="RoleResultMap">
-            select * from sys_role where id = #{id} and status = 1
-        </select>
+    <!-- 根据ID查询角色（仅查启用状态） -->
+    <select id="findById" parameterType="long" resultMap="RoleResultMap">
+        select * from sys_role where id = #{id} and status = 1
+    </select>
 
-        <select id="findAll" resultMap="RoleResultMap">
-            select * from sys_role where status = 1
-        </select>
+    <!-- 查询所有启用状态的角色 -->
+    <select id="findAll" resultMap="RoleResultMap">
+        select * from sys_role where status = 1
+    </select>
 
+    <!-- 新增角色 -->
     <insert id="insert" parameterType="com.sme.entity.Role" useGeneratedKeys="true" keyProperty="id">
         insert into sys_role
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -48,6 +51,7 @@
         </trim>
     </insert>
 
+    <!-- 修改角色 -->
     <update id="update" parameterType="com.sme.entity.Role">
         update sys_role
         <set>
@@ -60,20 +64,39 @@
         where id = #{id}
     </update>
 
-        <delete id="delete" parameterType="long">
-            delete from sys_role where id = #{id}
-        </delete>
+    <!-- 删除角色 -->
+    <delete id="delete" parameterType="long">
+        delete from sys_role where id = #{id}
+    </delete>
 
-        <insert id="insertRolePermission">
-            insert into role_permission(role_id, permission_id) values(#{roleId}, #{permissionId})
-        </insert>
+    <!-- 新增角色-权限关联 -->
+    <insert id="insertRolePermission">
+        insert into role_permission(role_id, permission_id) values(#{roleId}, #{permissionId})
+    </insert>
 
-        <delete id="deleteRolePermission" parameterType="long">
-            delete from role_permission where role_id = #{roleId}
-        </delete>
+    <!-- 删除角色-权限关联 -->
+    <delete id="deleteRolePermission" parameterType="long">
+        delete from role_permission where role_id = #{roleId}
+    </delete>
 
-        <select id="findPermissionIdsByRoleId" parameterType="long" resultType="long">
-            select permission_id from role_permission where role_id = #{roleId}
-        </select>
+    <!-- 根据角色ID查询权限ID列表 -->
+    <select id="findPermissionIdsByRoleId" parameterType="long" resultType="long">
+        select permission_id from role_permission where role_id = #{roleId}
+    </select>
+
+    <!-- 分页查询角色） -->
+    <select id="pageQuery" resultMap="RoleResultMap">
+        select * from sys_role
+        where status = 1
+        <if test="roleName != null and roleName != ''">
+            AND role_name LIKE CONCAT('%', #{roleName}, '%')
+        </if>
+        <if test="description != null and description != ''">
+            AND description LIKE CONCAT('%', #{description}, '%')
+        </if>
+        <if test="userId != null">
+            AND id IN (SELECT role_id FROM user_role WHERE user_id = #{userId})
+        </if>
+    </select>
 
 </mapper>

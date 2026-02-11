@@ -1,10 +1,13 @@
 package com.sme.controller;
 
+import com.sme.dto.EnterprisePageQueryDTO;
 import com.sme.entity.Enterprise;
+import com.sme.result.PageResult;
 import com.sme.result.Result;
 import com.sme.service.EnterpriseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin/enterprise")
+@Slf4j
 @Tag(name = "企业管理接口")
 public class EnterpriseController {
 
@@ -26,13 +30,12 @@ public class EnterpriseController {
      */
     @GetMapping("/page")
     @Operation(summary = "分页查询")
-    public Result<List<Enterprise>> page(
-            @RequestParam(required = false) String enterpriseName,
-            @RequestParam(required = false) String enterpriseType,
-            @RequestParam(required = false) String townId,
-            @RequestParam(required = false) String industryId,
-            @RequestParam(required = false) String businessStatus) {
-        return Result.success(enterpriseService.page(enterpriseName, businessStatus, enterpriseType, townId, industryId));
+    public Result<PageResult> page(EnterprisePageQueryDTO enterprisePageQueryDTO){
+        log.info("分页查询参数：{}", "");
+        PageResult page = enterpriseService.page(enterprisePageQueryDTO);
+        PageResult pageResult = new PageResult(page.getTotal(), page.getRecords());
+        return Result.success(pageResult);
+
     }
 
     /**

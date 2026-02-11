@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @Builder
@@ -51,4 +52,9 @@ public class UserPageQueryDTO implements Serializable {
      * 所属部门ID，关联sys_dept表
      */
     private Long deptId;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 }

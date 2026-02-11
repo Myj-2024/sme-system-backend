@@ -1,6 +1,8 @@
 package com.sme.mapper;
 
+import com.github.pagehelper.Page;
 import com.sme.dto.SysDictItemDTO;
+import com.sme.dto.SysDictItemPageQueryDTO;
 import com.sme.entity.SysDictItem;
 import com.sme.vo.SysDictItemVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -62,10 +64,14 @@ public interface DictItemMapper {
      */
     void update(SysDictItem item);
 
+
     /**
      * 查询字典项列表
-     * @param itemVO
+     * @param sysDictItemPageQueryDTO
      * @return
      */
-    List<SysDictItemVO> selectItemList(SysDictItemVO itemVO);
+    Page<SysDictItem> selectItemList(SysDictItemPageQueryDTO sysDictItemPageQueryDTO);
+
+
+
 }

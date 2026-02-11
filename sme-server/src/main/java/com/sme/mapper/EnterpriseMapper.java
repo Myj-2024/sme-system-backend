@@ -1,5 +1,7 @@
 package com.sme.mapper;
 
+import com.github.pagehelper.Page;
+import com.sme.dto.EnterprisePageQueryDTO;
 import com.sme.entity.Enterprise;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -15,12 +17,7 @@ public interface EnterpriseMapper {
      * @param businessStatus
      * @return
      */
-     List<Enterprise> selectPage(@Param("enterpriseName") String enterpriseName,
-                                 @Param("businessStatus") String businessStatus,
-                                 @Param("enterpriseType") String enterpriseType,
-                                 @Param("townId") String townId,
-                                 @Param("industryId") String industryId
-                            );
+
 
      /**
      * 新增企业
@@ -61,4 +58,11 @@ public interface EnterpriseMapper {
     void updateStatus(
            @Param("id") Long id,
            @Param("status") Integer status);
+
+    /**
+     * 分页查询
+     * @param enterprisePageQueryDTO
+     * @return
+     */
+    Page<Enterprise> selectPage(EnterprisePageQueryDTO enterprisePageQueryDTO);
 }

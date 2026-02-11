@@ -1,5 +1,7 @@
 package com.sme.mapper;
 
+import com.github.pagehelper.Page;
+import com.sme.dto.DictPageQueryDTO;
 import com.sme.dto.SysDictDTO;
 import com.sme.entity.SysDict;
 import jakarta.validation.constraints.NotBlank;
@@ -15,7 +17,7 @@ public interface DictMapper {
      * @return
      */
 
-    List<SysDict> selectDictList();
+
 
     /**
      * 唯一性校验：字典编码
@@ -77,4 +79,5 @@ public interface DictMapper {
     String selectDictById(Long id);
 
 
+    Page<SysDict> selectDictList(DictPageQueryDTO dictPageQueryDTO);
 }

@@ -1,7 +1,9 @@
 package com.sme.service;
 
+import com.sme.dto.DictPageQueryDTO;
 import com.sme.dto.SysDictDTO;
 import com.sme.entity.SysDict;
+import com.sme.result.PageResult;
 import com.sme.result.Result;
 import java.util.List;
 
@@ -11,7 +13,7 @@ public interface DictService {
     /**
      * 查询字典列表
      */
-    List<SysDict> selectDictList();
+    PageResult selectDictList(DictPageQueryDTO dictPageQueryDTO);
 
     /**
      * 获取全部字典（下拉框）

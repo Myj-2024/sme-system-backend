@@ -1,8 +1,12 @@
 package com.sme.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sme.dto.RoleDTO;
+import com.sme.dto.RolePageQueryDTO;
 import com.sme.entity.Role;
 import com.sme.mapper.RoleMapper;
+import com.sme.result.PageResult;
 import com.sme.service.RoleService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +22,13 @@ public class RoleServiceImpl implements RoleService {
     @Autowired
     private RoleMapper roleMapper;
 
+
     @Override
-    public List<Role> findRolesByUserId(Long userId) {
-        return roleMapper.findRolesByUserId(userId);
+    public PageResult findRolesByUserId(RolePageQueryDTO rolePageQueryDTO) {
+
+        PageHelper.startPage(rolePageQueryDTO.getPageNum(), rolePageQueryDTO.getPageSize());
+        Page<Role> page = roleMapper.pageQuery(rolePageQueryDTO);
+        return new PageResult(page.getTotal(), page.getResult());
     }
 
     @Override

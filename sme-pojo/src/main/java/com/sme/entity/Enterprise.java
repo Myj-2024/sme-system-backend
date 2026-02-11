@@ -18,6 +18,7 @@ public class Enterprise {
     private Date establishTime;  // 成立时间
     private String townId;  // 所属乡镇
     private String industryId;  // 所属行业
+    private String mainProduct; // 主要产品
     private String businessStatus;  // 经营状态
     private Date createTime;  // 创建时间
     private Date updateTime;  // 更新时间

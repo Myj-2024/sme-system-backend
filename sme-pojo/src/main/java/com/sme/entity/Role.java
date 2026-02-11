@@ -43,6 +43,7 @@ public class Role{
      * 角色编码
      */
     private String roleCode;
+
     /**
      * 描述
      */

@@ -1,8 +1,12 @@
 package com.sme.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sme.dto.SysDictItemDTO;
+import com.sme.dto.SysDictItemPageQueryDTO;
 import com.sme.entity.SysDictItem;
 import com.sme.mapper.DictItemMapper;
+import com.sme.result.PageResult;
 import com.sme.result.Result;
 import com.sme.service.DictItemService;
 import com.sme.vo.SysDictItemVO;
@@ -19,10 +23,6 @@ public class DictItemServiceImpl implements DictItemService {
     @Autowired
     private DictItemMapper itemMapper;
 
-    @Override
-    public List<SysDictItemVO> selectItemList(SysDictItemVO itemVO) {
-        return itemMapper.selectItemList(itemVO);
-    }
 
     @Override
     public List<SysDictItemVO> selectItemsByDictCode(String dictCode) {
@@ -80,5 +80,12 @@ public class DictItemServiceImpl implements DictItemService {
     public Result<String> deleteItemByIds(Long[] ids) {
         itemMapper.deleteItemByIds(ids);
         return Result.success("删除成功");
+    }
+
+    @Override
+    public PageResult selectItemList(SysDictItemPageQueryDTO sysDictItemPageQueryDTO) {
+        PageHelper.startPage((sysDictItemPageQueryDTO.getPageNum()), sysDictItemPageQueryDTO.getPageSize());
+        Page<SysDictItem> page = itemMapper.selectItemList(sysDictItemPageQueryDTO);
+        return new PageResult(page.getTotal(), page.getResult());
     }
 }

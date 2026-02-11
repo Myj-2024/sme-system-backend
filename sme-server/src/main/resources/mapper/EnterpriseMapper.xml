@@ -26,6 +26,8 @@
         <result column="industry_id" property="industryId" />
         <!--        经营状态-->
         <result column="business_status" property="businessStatus" />
+<!--        主要产品-->
+        <result column="main_product" property="mainProduct" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="del_flag" property="delFlag" />
@@ -45,6 +47,7 @@
             town_id,
             industry_id,
             business_status,
+            main_product,
             del_flag
         ) VALUES (
             #{enterpriseName},
@@ -58,6 +61,7 @@
             #{townId},
             #{industryId},
             #{businessStatus},
+            #{mainProduct},
             0
         )
     </insert>
@@ -99,6 +103,9 @@
             <if test="businessStatus != null">
                 business_status = #{businessStatus},
             </if>
+            <if test="mainProduct != null">
+                main_product = #{mainProduct},
+            </if>
             update_time = now(),
         </set>
         WHERE id = #{id}
@@ -132,7 +139,7 @@
         id, enterprise_name, credit_code, enterprise_type,
         phone, business_addr, legal_person, reg_capital,
         establish_time, town_id, industry_id,
-        business_status, create_time, update_time, del_flag
+        business_status, create_time, update_time,main_product,del_flag
         FROM sme_enterprise
         WHERE del_flag = 0
         <if test="enterpriseName != null and enterpriseName != ''">
@@ -159,7 +166,7 @@
         id, enterprise_name, credit_code, enterprise_type,
         phone, business_addr, legal_person, reg_capital,
         establish_time, town_id, industry_id,
-        business_status, create_time, update_time, del_flag
+        business_status, create_time, update_time,main_product, del_flag
         FROM sme_enterprise
         WHERE id = #{id}
     </select>

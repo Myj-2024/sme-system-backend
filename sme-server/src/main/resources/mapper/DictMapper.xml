@@ -25,9 +25,6 @@
             <if test="dictName != null and dictName != ''">
                 AND dict_name like concat('%', #{dictName}, '%')
             </if>
-            <if test="dictCode != null and dictCode != ''">
-                AND dict_code like concat('%', #{dictCode}, '%')
-            </if>
             <if test="status != null">
                 AND status = #{status}
             </if>

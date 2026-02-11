@@ -69,7 +69,7 @@
 
 <!--    分页查询-->
     <select id="pageQuery" resultMap="UserResultMap">
-        select u.id, u.username, u.real_name, u.phone, u.dept_id, u.status, d.dept_name
+        select u.id, u.username, u.real_name, u.phone, u.dept_id, u.status, d.dept_name,u.create_time
         FROM sys_user u
         LEFT JOIN sys_dept d ON u.dept_id = d.id
         <where>

@@ -13,6 +13,7 @@ import java.util.Date;
 @NoArgsConstructor  // 必须有：无参构造
 @AllArgsConstructor
 public class SysDict implements Serializable {
+
     private Long id;
     private String dictCode;
     private String dictName;

@@ -1,6 +1,8 @@
 package com.sme.service;
 
+import com.sme.dto.EnterprisePageQueryDTO;
 import com.sme.entity.Enterprise;
+import com.sme.result.PageResult;
 
 import java.util.List;
 
@@ -10,7 +12,7 @@ public interface EnterpriseService {
      * 分页查询
      * @return
      */
-    List<Enterprise> page(String enterpriseName, String businessStatus,String enterpriseType,String townId,String industryId);
+    PageResult page(EnterprisePageQueryDTO enterprisePageQueryDTO);
 
     /**
      * 新增企业
