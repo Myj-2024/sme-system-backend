@@ -40,4 +40,18 @@ public interface SmePleService {
      * @return
      */
     Boolean deleteById(Long id);
+
+    /**
+     * 检查企业是否被包抓联引用
+     * @param enterpriseId
+     * @return
+     */
+    boolean checkEnterpriseBind(Long enterpriseId);
+
+    /**
+     * 检查部门是否被包抓联引用
+     * @param deptId
+     * @return
+     */
+    boolean checkDeptBind(Long deptId);
 }

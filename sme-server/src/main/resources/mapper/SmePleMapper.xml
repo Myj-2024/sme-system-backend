@@ -6,22 +6,20 @@
 <mapper namespace="com.sme.mapper.SmePleMapper">
 
     <!-- ==================== ResultMap ==================== -->
-
     <resultMap id="SmePleResultMap"
                type="com.sme.entity.SmePLE">
-
         <id     column="id"                     property="id"/>
         <result column="leader_name"            property="leaderName"/>
         <result column="enterprise_id"          property="enterpriseId"/>
-        <result column="enterprise_name"     property="enterpriseName"/>
-        <result column="enterprise_leader"   property="enterpriseLeader"/>
-        <result column="enterprise_phone"           property="enterprisePhone"/>
-        <result column="reg_addr"          property="regAddr"/>
-        <result column="main_product"          property="mainProduct"/>
+        <result column="enterprise_name"        property="enterpriseName"/>
+        <result column="enterprise_leader"      property="enterpriseLeader"/>
+        <result column="enterprise_phone"       property="enterprisePhone"/>
+        <result column="reg_addr"               property="regAddr"/>
+        <result column="main_product"           property="mainProduct"/>
         <result column="class_monitor"          property="classMonitor"/>
-        <result column="class_phone"          property="classPhone"/>
+        <result column="class_phone"            property="classPhone"/>
         <result column="class_dept_id"          property="classDeptId"/>
-        <result column="class_dept_name"          property="classDeptName"/>
+        <result column="class_dept_name"        property="classDeptName"/>
         <result column="remark"                 property="remark"/>
         <result column="create_time"            property="createTime"/>
         <result column="update_time"            property="updateTime"/>
@@ -33,7 +31,6 @@
             parameterType="com.sme.entity.SmePLE"
             useGeneratedKeys="true"
             keyProperty="id">
-
         INSERT INTO gh_sme_service.sme_lpe (
             leader_name,
             enterprise_id,
@@ -67,8 +64,8 @@
                      NOW(),
                      0
                  )
-
     </insert>
+
     <!-- 修改包抓联 -->
     <update id="update" parameterType="com.sme.entity.SmePLE">
         UPDATE gh_sme_service.sme_lpe
@@ -95,7 +92,6 @@
         DELETE FROM gh_sme_service.sme_lpe
         WHERE id = #{id}
     </delete>
-
 
     <select id="page" resultMap="SmePleResultMap">
         SELECT
@@ -138,8 +134,7 @@
         ORDER BY lpe.create_time DESC
     </select>
 
-<!--    根据id查询-->
-
+    <!-- 根据id查询 -->
     <select id="getPleById" resultMap="SmePleResultMap">
         SELECT
             lpe.id,
@@ -165,5 +160,21 @@
                            ON lpe.class_dept_id = d.id AND d.del_flag = 0
         WHERE lpe.del_flag = 0
           AND lpe.id = #{id}
+    </select>
+
+    <!-- 根据企业ID统计数量 -->
+    <select id="countByEnterpriseId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM gh_sme_service.sme_lpe
+        WHERE del_flag = 0
+          AND enterprise_id = #{enterpriseId}
+    </select>
+
+    <!-- 根据部门ID统计数量 -->
+    <select id="countByDeptId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM gh_sme_service.sme_lpe
+        WHERE del_flag = 0
+          AND class_dept_id = #{deptId}
     </select>
 </mapper>

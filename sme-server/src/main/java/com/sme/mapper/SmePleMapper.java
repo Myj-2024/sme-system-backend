@@ -42,4 +42,18 @@ public interface SmePleMapper {
      * @return
      */
     int deleteById(Long id);
+
+    /**
+     * 根据企业ID统计包抓联数量
+     * @param enterpriseId
+     * @return
+     */
+    Integer countByEnterpriseId(Long enterpriseId);
+
+    /**
+     * 根据部门ID统计包抓联数量
+     * @param deptId
+     * @return
+     */
+    Integer countByDeptId(Long deptId);
 }

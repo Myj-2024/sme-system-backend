@@ -11,6 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @Slf4j
 @RequestMapping("/admin/smeple")
@@ -19,7 +22,6 @@ public class SmePleController {
 
     @Autowired
     private SmePleService smePleService;
-
 
     /**
      * 分页查询
@@ -31,13 +33,11 @@ public class SmePleController {
         PageResult page = smePleService.pageQuery(smePleQueryDTO);
         PageResult pageResult = new PageResult(page.getTotal(), page.getRecords());
         return Result.success(pageResult);
-
     }
 
     /**
      * 根据id查询
      */
-
     @GetMapping("/{id}")
     public Result<SmePLE> getPleById(@PathVariable Long id){
         SmePLE smePLE = smePleService.getPleById(id);
@@ -90,5 +90,29 @@ public class SmePleController {
         }
     }
 
+    /**
+     * 检查企业是否被包抓联引用
+     */
+    @GetMapping("/check/enterprise/{enterpriseId}")
+    @Operation(summary = "检查企业是否被包抓联引用", description = "检查企业是否被包抓联引用")
+    public Result<Map<String, Boolean>> checkEnterpriseBind(@PathVariable Long enterpriseId) {
+        log.info("检查企业是否被包抓联引用，企业ID：{}", enterpriseId);
+        boolean hasBind = smePleService.checkEnterpriseBind(enterpriseId);
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("hasBind", hasBind);
+        return Result.success(result);
+    }
 
+    /**
+     * 检查部门是否被包抓联引用
+     */
+    @GetMapping("/check/dept/{deptId}")
+    @Operation(summary = "检查部门是否被包抓联引用", description = "检查部门是否被包抓联引用")
+    public Result<Map<String, Boolean>> checkDeptBind(@PathVariable Long deptId) {
+        log.info("检查部门是否被包抓联引用，部门ID：{}", deptId);
+        boolean hasBind = smePleService.checkDeptBind(deptId);
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("hasBind", hasBind);
+        return Result.success(result);
+    }
 }

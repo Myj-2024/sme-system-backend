@@ -67,4 +67,26 @@ public class SmePleServiceImpl implements SmePleService {
     public Boolean deleteById(Long id) {
         return smePleMapper.deleteById(id) > 0;
     }
+
+    /**
+     * 检查企业是否被包抓联引用
+     * @param enterpriseId
+     * @return
+     */
+    @Override
+    public boolean checkEnterpriseBind(Long enterpriseId) {
+        Integer count = smePleMapper.countByEnterpriseId(enterpriseId);
+        return count != null && count > 0;
+    }
+
+    /**
+     * 检查部门是否被包抓联引用
+     * @param deptId
+     * @return
+     */
+    @Override
+    public boolean checkDeptBind(Long deptId) {
+        Integer count = smePleMapper.countByDeptId(deptId);
+        return count != null && count > 0;
+    }
 }
