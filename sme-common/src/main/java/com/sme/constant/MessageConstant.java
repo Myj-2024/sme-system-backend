@@ -17,4 +17,5 @@ public class MessageConstant {
     public static final String DICT_NOT_EXIST = "字典不存在";
     public static final String DICT_STATUS_ERROR = "字典状态只能是0（禁用）或1（启用）";
     public static final String DICT_UPDATE_ERROR = "字典修改失败";
+    public static final String UPLOAD_FAILED = "上传失败";
 }

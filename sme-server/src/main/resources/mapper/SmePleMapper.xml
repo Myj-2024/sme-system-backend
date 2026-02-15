@@ -6,175 +6,215 @@
 <mapper namespace="com.sme.mapper.SmePleMapper">
 
     <!-- ==================== ResultMap ==================== -->
-    <resultMap id="SmePleResultMap"
-               type="com.sme.entity.SmePLE">
-        <id     column="id"                     property="id"/>
-        <result column="leader_name"            property="leaderName"/>
-        <result column="enterprise_id"          property="enterpriseId"/>
-        <result column="enterprise_name"        property="enterpriseName"/>
-        <result column="enterprise_leader"      property="enterpriseLeader"/>
-        <result column="enterprise_phone"       property="enterprisePhone"/>
-        <result column="reg_addr"               property="regAddr"/>
-        <result column="main_product"           property="mainProduct"/>
-        <result column="class_monitor"          property="classMonitor"/>
-        <result column="class_phone"            property="classPhone"/>
-        <result column="class_dept_id"          property="classDeptId"/>
-        <result column="class_dept_name"        property="classDeptName"/>
-        <result column="remark"                 property="remark"/>
-        <result column="create_time"            property="createTime"/>
-        <result column="update_time"            property="updateTime"/>
-        <result column="del_flag"               property="delFlag"/>
+    <resultMap id="SmePleResultMap" type="com.sme.entity.SmePLE">
+
+        <id column="id" property="id"/>
+
+        <result column="leader_name" property="leaderName"/>
+        <result column="enterprise_id" property="enterpriseId"/>
+        <result column="dept_id" property="classDeptId"/>
+
+        <!-- 企业信息 -->
+        <result column="enterprise_name" property="enterpriseName"/>
+        <result column="legal_person" property="enterpriseLeader"/>
+        <result column="enterprise_phone" property="enterprisePhone"/>
+        <result column="business_addr" property="regAddr"/>
+        <result column="main_product" property="mainProduct"/>
+
+        <!-- 部门信息 -->
+        <result column="dept_name" property="classDeptName"/>
+        <result column="dept_leader" property="classMonitor"/>
+        <result column="dept_phone" property="classPhone"/>
+
+        <!-- 通用字段 -->
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del_flag" property="delFlag"/>
+
     </resultMap>
 
-    <!-- 新增包抓联 -->
+    <!-- ==================== 新增 ==================== -->
     <insert id="insert"
             parameterType="com.sme.entity.SmePLE"
             useGeneratedKeys="true"
             keyProperty="id">
-        INSERT INTO gh_sme_service.sme_lpe (
+
+        INSERT INTO gh_sme_service.sme_lpe
+        (
             leader_name,
             enterprise_id,
-            enterprise_name,
-            enterprise_leader,
-            enterprise_phone,
-            reg_addr,
-            main_product,
-            class_monitor,
-            class_phone,
-            class_dept_id,
-            class_dept_name,
+            dept_id,
             remark,
             create_time,
             update_time,
             del_flag
-        ) VALUES (
-                     #{leaderName},
-                     #{enterpriseId},
-                     #{enterpriseName},
-                     #{enterpriseLeader},
-                     #{enterprisePhone},
-                     #{regAddr},
-                     #{mainProduct},
-                     #{classMonitor},
-                     #{classPhone},
-                     #{classDeptId},
-                     #{classDeptName},
-                     #{remark},
-                     NOW(),
-                     NOW(),
-                     0
-                 )
+        )
+        VALUES
+            (
+                #{leaderName},
+                #{enterpriseId},
+                #{classDeptId},
+                #{remark},
+                NOW(),
+                NOW(),
+                0
+            )
+
     </insert>
 
-    <!-- 修改包抓联 -->
+
+    <!-- ==================== 修改 ==================== -->
     <update id="update" parameterType="com.sme.entity.SmePLE">
+
         UPDATE gh_sme_service.sme_lpe
         SET
             leader_name = #{leaderName},
             enterprise_id = #{enterpriseId},
-            enterprise_name = #{enterpriseName},
-            enterprise_leader = #{enterpriseLeader},
-            enterprise_phone = #{enterprisePhone},
-            reg_addr = #{regAddr},
-            main_product = #{mainProduct},
-            class_monitor = #{classMonitor},
-            class_phone = #{classPhone},
-            class_dept_id = #{classDeptId},
-            class_dept_name = #{classDeptName},
+            dept_id = #{classDeptId},
             remark = #{remark},
             update_time = NOW()
         WHERE id = #{id}
           AND del_flag = 0
+
     </update>
 
-    <!-- 物理删除 -->
+
+    <!-- ==================== 删除 ==================== -->
     <delete id="deleteById">
         DELETE FROM gh_sme_service.sme_lpe
         WHERE id = #{id}
     </delete>
 
+
+    <!-- ==================== 分页查询 ==================== -->
     <select id="page" resultMap="SmePleResultMap">
+
         SELECT
-        lpe.id,
-        lpe.leader_name,
-        lpe.enterprise_id,
-        lpe.enterprise_name,
-        lpe.enterprise_leader,
-        lpe.enterprise_phone,
-        lpe.reg_addr,
-        lpe.main_product,
-        lpe.class_monitor,
-        lpe.class_phone,
-        lpe.class_dept_id,
-        lpe.class_dept_name,
-        lpe.remark,
-        lpe.create_time,
-        lpe.update_time,
-        lpe.del_flag
-        FROM gh_sme_service.sme_lpe lpe
-        -- 关联企业表（左连接：保证即使企业表数据缺失，主表数据仍能查询）
-        LEFT JOIN gh_sme_service.sme_enterprise e ON lpe.enterprise_id = e.id AND e.del_flag = 0
-        -- 关联部门表（左连接：保证即使部门表数据缺失，主表数据仍能查询）
-        LEFT JOIN gh_sme_service.sys_dept d ON lpe.class_dept_id = d.id AND d.del_flag = 0
-        WHERE lpe.del_flag = 0
-        <!-- 前端指定的查询条件：模糊匹配 -->
+        l.id,
+        l.leader_name,
+        l.enterprise_id,
+        l.dept_id,
+
+        -- 企业信息
+        e.enterprise_name,
+        e.legal_person,
+        e.phone AS enterprise_phone,
+        e.business_addr,
+        e.main_product,
+
+        -- 部门信息
+        d.dept_name,
+        d.leader AS dept_leader,
+        d.phone  AS dept_phone,
+
+        -- 通用字段
+        l.remark,
+        l.create_time,
+        l.update_time,
+        l.del_flag
+
+        FROM gh_sme_service.sme_lpe l
+
+        LEFT JOIN gh_sme_service.sme_enterprise e
+        ON l.enterprise_id = e.id
+        AND e.del_flag = 0
+
+        LEFT JOIN gh_sme_service.sys_dept d
+        ON l.dept_id = d.id
+        AND d.del_flag = 0
+        AND d.status = 1
+
+        WHERE l.del_flag = 0
+
         <if test="leaderName != null and leaderName != ''">
-            AND lpe.leader_name LIKE CONCAT('%', #{leaderName}, '%')
+            AND l.leader_name LIKE CONCAT('%', #{leaderName}, '%')
         </if>
+
         <if test="enterpriseName != null and enterpriseName != ''">
-            AND lpe.enterprise_name LIKE CONCAT('%', #{enterpriseName}, '%')
+            AND e.enterprise_name LIKE CONCAT('%', #{enterpriseName}, '%')
         </if>
-        <if test="classMonitor != null and classMonitor != ''">
-            AND lpe.class_monitor LIKE CONCAT('%', #{classMonitor}, '%')
-        </if>
+
         <if test="classDeptName != null and classDeptName != ''">
-            AND lpe.class_dept_name LIKE CONCAT('%', #{classDeptName}, '%')
+            AND d.dept_name LIKE CONCAT('%', #{classDeptName}, '%')
         </if>
-        <!-- 排序：按创建时间倒序，保证最新数据在前 -->
-        ORDER BY lpe.create_time DESC
+
+        <if test="classMonitor != null and classMonitor != ''">
+            AND d.leader LIKE CONCAT('%', #{classMonitor}, '%')
+        </if>
+
+        ORDER BY l.create_time DESC
+
     </select>
 
-    <!-- 根据id查询 -->
+
+    <!-- ==================== 根据ID查询 ==================== -->
     <select id="getPleById" resultMap="SmePleResultMap">
+
         SELECT
-            lpe.id,
-            lpe.leader_name,
-            lpe.enterprise_id,
-            lpe.enterprise_name,
-            lpe.enterprise_leader,
-            lpe.enterprise_phone,
-            lpe.reg_addr,
-            lpe.main_product,
-            lpe.class_monitor,
-            lpe.class_phone,
-            lpe.class_dept_id,
-            lpe.class_dept_name,
-            lpe.remark,
-            lpe.create_time,
-            lpe.update_time,
-            lpe.del_flag
-        FROM gh_sme_service.sme_lpe lpe
+            l.id,
+            l.leader_name,
+            l.enterprise_id,
+            l.dept_id,
+
+            -- 企业信息
+            e.enterprise_name,
+            e.legal_person,
+            e.phone AS enterprise_phone,
+            e.business_addr,
+            e.main_product,
+
+            -- 部门信息
+            d.dept_name,
+            d.leader AS dept_leader,
+            d.phone  AS dept_phone,
+
+            -- 通用字段
+            l.remark,
+            l.create_time,
+            l.update_time,
+            l.del_flag
+
+        FROM gh_sme_service.sme_lpe l
+
                  LEFT JOIN gh_sme_service.sme_enterprise e
-                           ON lpe.enterprise_id = e.id AND e.del_flag = 0
+                           ON l.enterprise_id = e.id
+                               AND e.del_flag = 0
+
                  LEFT JOIN gh_sme_service.sys_dept d
-                           ON lpe.class_dept_id = d.id AND d.del_flag = 0
-        WHERE lpe.del_flag = 0
-          AND lpe.id = #{id}
+                           ON l.dept_id = d.id
+                               AND d.del_flag = 0
+                               AND d.status = 1
+
+        WHERE l.del_flag = 0
+          AND l.id = #{id}
+
     </select>
 
-    <!-- 根据企业ID统计数量 -->
-    <select id="countByEnterpriseId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+
+    <!-- ==================== 企业统计 ==================== -->
+    <select id="countByEnterpriseId"
+            parameterType="java.lang.Long"
+            resultType="java.lang.Integer">
+
         SELECT COUNT(1)
         FROM gh_sme_service.sme_lpe
         WHERE del_flag = 0
           AND enterprise_id = #{enterpriseId}
+
     </select>
 
-    <!-- 根据部门ID统计数量 -->
-    <select id="countByDeptId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+
+    <!-- ==================== 部门统计（改为dept_id） ==================== -->
+    <select id="countByDeptId"
+            parameterType="java.lang.Long"
+            resultType="java.lang.Integer">
+
         SELECT COUNT(1)
         FROM gh_sme_service.sme_lpe
         WHERE del_flag = 0
-          AND class_dept_id = #{deptId}
+          AND dept_id = #{deptId}
+
     </select>
+
 </mapper>

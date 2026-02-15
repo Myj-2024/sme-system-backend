@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.sme.mapper.SmePackageContactMapper">
 
-    <!-- 结果映射：匹配实体类和数据库字段 -->
+    <!-- 通用结果映射 -->
     <resultMap id="SmePackageContactResultMap" type="com.sme.entity.SmePackageContact">
         <id column="id" property="id"/>
         <result column="package_no" property="packageNo"/>
         <result column="process_status" property="processStatus"/>
-        <result column="dept_id" property="deptId"/>
+        <result column="lpe_id" property="lpeId"/>
         <result column="leader_name" property="leaderName"/>
         <result column="enterprise_id" property="enterpriseId"/>
-        <!-- 新增的冗余字段映射 -->
         <result column="enterprise_name" property="enterpriseName"/>
-        <result column="enterprise_leader" property="enterpriseLeader"/>
+        <result column="legal_person" property="enterpriseLeader"/>
         <result column="enterprise_phone" property="enterprisePhone"/>
-        <result column="class_monitor" property="classMonitor"/>
-        <result column="class_dept_name" property="classDeptName"/>
-        <result column="class_phone" property="classPhone"/>
-        <!-- 原有核心字段映射 -->
+        <result column="dept_name" property="classDeptName"/>
+        <result column="dept_leader" property="classMonitor"/>
+        <result column="dept_phone" property="classPhone"/>
         <result column="enterprise_problem" property="enterpriseProblem"/>
         <result column="problem_receive_time" property="problemReceiveTime"/>
         <result column="problem_type" property="problemType"/>
@@ -32,60 +32,145 @@
         <result column="del_flag" property="delFlag"/>
     </resultMap>
 
-    <!-- 分页查询SQL：支持多条件模糊/精准筛选，仅查询未删除的数据 -->
+    <!-- 分页查询 -->
     <select id="pageQuery" resultMap="SmePackageContactResultMap">
         SELECT
-        id,
-        package_no,
-        process_status,
-        leader_name,
-        enterprise_id,
-        enterprise_name,
-        enterprise_leader,
-        enterprise_phone,
-        class_monitor,
-        class_dept_name,
-        class_phone,
-        enterprise_problem,
-        problem_receive_time,
-        problem_type,
-        handle_result,
-        handle_content,
-        unable_reason,
-        complete_time,
-        handle_remark,
-        remark,
-        create_time,
-        update_time,
-        del_flag
-        FROM gh_sme_service.sme_package_contact
-        WHERE del_flag = 0
-        <!-- 流程状态筛选：精准匹配 -->
+        p.id,
+        p.package_no,
+        p.process_status,
+        p.lpe_id,
+        l.leader_name,
+        l.enterprise_id,
+        e.enterprise_name,
+        e.legal_person,
+        e.phone AS enterprise_phone,
+        d.dept_name,
+        d.leader AS dept_leader,
+        d.phone AS dept_phone,
+        p.enterprise_problem,
+        p.problem_receive_time,
+        p.problem_type,
+        p.handle_result,
+        p.handle_content,
+        p.unable_reason,
+        p.complete_time,
+        p.handle_remark,
+        p.remark,
+        p.create_time,
+        p.update_time,
+        p.del_flag
+        FROM gh_sme_service.sme_package_contact p
+        LEFT JOIN gh_sme_service.sme_lpe l ON p.lpe_id = l.id AND l.del_flag = 0
+        LEFT JOIN gh_sme_service.sme_enterprise e ON l.enterprise_id = e.id AND e.del_flag = 0
+        LEFT JOIN gh_sme_service.sys_dept d ON l.dept_id = d.id AND d.del_flag = 0 AND d.status = 1
+        WHERE p.del_flag = 0
         <if test="processStatus != null and processStatus != ''">
-            AND process_status = #{processStatus}
+            AND p.process_status = #{processStatus}
         </if>
-        <!-- 包抓领导姓名：模糊查询 -->
         <if test="leaderName != null and leaderName != ''">
-            AND leader_name LIKE CONCAT('%', #{leaderName}, '%')
+            AND l.leader_name LIKE CONCAT('%', #{leaderName}, '%')
         </if>
-        <!-- 企业名称：模糊查询 -->
         <if test="enterpriseName != null and enterpriseName != ''">
-            AND enterprise_name LIKE CONCAT('%', #{enterpriseName}, '%')
+            AND e.enterprise_name LIKE CONCAT('%', #{enterpriseName}, '%')
         </if>
-        <!-- 专班班长：模糊查询 -->
         <if test="classMonitor != null and classMonitor != ''">
-            AND class_monitor LIKE CONCAT('%', #{classMonitor}, '%')
+            AND d.leader LIKE CONCAT('%', #{classMonitor}, '%')
         </if>
-        <!-- 专班负责单位名称：模糊查询 -->
         <if test="classDeptName != null and classDeptName != ''">
-            AND class_dept_name LIKE CONCAT('%', #{classDeptName}, '%')
+            AND d.dept_name LIKE CONCAT('%', #{classDeptName}, '%')
         </if>
-        <!-- 问题类型：精准匹配 -->
         <if test="problemType != null and problemType != ''">
-            AND problem_type = #{problemType}
+            AND p.problem_type = #{problemType}
         </if>
-        <!-- 排序：按更新时间倒序，保证最新数据在前 -->
-        ORDER BY update_time DESC
+        ORDER BY p.update_time DESC
     </select>
+
+    <!-- 插入记录 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO gh_sme_service.sme_package_contact
+        (
+            package_no,
+            process_status,
+            lpe_id,
+            enterprise_problem,
+            problem_receive_time,
+            problem_type,
+            handle_result,
+            handle_content,
+            unable_reason,
+            complete_time,
+            handle_remark,
+            remark,
+            del_flag,
+            create_time,
+            update_time
+        )
+        VALUES
+            (
+                #{packageNo},
+                #{processStatus},
+                #{lpeId},
+                #{enterpriseProblem},
+                #{problemReceiveTime},
+                #{problemType},
+                #{handleResult},
+                #{handleContent},
+                #{unableReason},
+                #{completeTime},
+                #{handleRemark},
+                #{remark},
+                #{delFlag},
+                NOW(),
+                NOW()
+            )
+    </insert>
+
+    <!-- 根据ID查询详情 -->
+    <select id="selectById" parameterType="java.lang.Long" resultMap="SmePackageContactResultMap">
+        SELECT
+            p.id,
+            p.package_no,
+            p.process_status,
+            p.lpe_id,
+            l.leader_name,
+            l.enterprise_id,
+            e.enterprise_name,
+            e.legal_person,
+            e.phone AS enterprise_phone,
+            d.dept_name,
+            d.leader AS dept_leader,
+            d.phone AS dept_phone,
+            p.enterprise_problem,
+            p.problem_receive_time,
+            p.problem_type,
+            p.handle_result,
+            p.handle_content,
+            p.unable_reason,
+            p.complete_time,
+            p.handle_remark,
+            p.remark,
+            p.create_time,
+            p.update_time,
+            p.del_flag
+        FROM gh_sme_service.sme_package_contact p
+                 LEFT JOIN gh_sme_service.sme_lpe l ON p.lpe_id = l.id AND l.del_flag = 0
+                 LEFT JOIN gh_sme_service.sme_enterprise e ON l.enterprise_id = e.id AND e.del_flag = 0
+                 LEFT JOIN gh_sme_service.sys_dept d ON l.dept_id = d.id AND d.del_flag = 0 AND d.status = 1
+        WHERE p.id = #{id} AND p.del_flag = 0
+    </select>
+
+    <!-- 新增：更新问题办理状态 -->
+    <update id="updateProcessStatus">
+        UPDATE gh_sme_service.sme_package_contact
+        SET process_status = #{processStatus},
+        update_time = NOW()
+        <if test="completeTime != null and completeTime != ''">
+            , complete_time = STR_TO_DATE(#{completeTime}, '%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="unableReason != null and unableReason != ''">
+            , unable_reason = #{unableReason}
+        </if>
+        WHERE id = #{id} AND del_flag = 0
+    </update>
 
 </mapper>

@@ -13,11 +13,14 @@ public class SmePackageContact implements Serializable {
     /** 主键ID（自增） */
     private Long id;
 
-    /** 包抓联编号（系统自动生成） */
+    /** 问题编号（系统自动生成） */
     private String packageNo;
 
     /** 流程状态：UNHANDLED-未受理 HANDLING-办理中 COMPLETED-已办结 UNABLE-无法办理 */
     private String processStatus;
+
+    /** 关联 lpe 表 */
+    private Long lpeId;
 
     /** 包抓领导姓名 */
     private String leaderName;
@@ -25,23 +28,23 @@ public class SmePackageContact implements Serializable {
     /** 包联企业ID，关联sme_enterprise.id */
     private Long enterpriseId;
 
-    /** 企业名称（冗余，来自sme_lpe.enterprise_name） */
+    /** 企业名称 */
     private String enterpriseName;
 
-    /** 企业负责人（冗余，来自sme_lpe.enterprise_leader） */
+    /** 企业负责人 */
     private String enterpriseLeader;
 
-    /** 企业联系电话（冗余，来自sme_lpe.enterprise_phone） */
+    /** 企业联系电话 */
     private String enterprisePhone;
 
     /** 专班班长 */
     private String classMonitor;
 
 
-    /** 专班负责单位名称（冗余，来自sme_lpe.class_dept_name） */
+    /** 专班负责单位名称 */
     private String classDeptName;
 
-    /** 专班联系电话（冗余，来自sme_lpe.class_phone） */
+    /** 专班联系电话 */
     private String classPhone;
 
     /** 包联企业反映的问题 */
@@ -50,10 +53,10 @@ public class SmePackageContact implements Serializable {
     /** 问题接收时间 */
     private LocalDateTime problemReceiveTime;
 
-    /** 问题类型，关联sys_dict_item.item_code */
+    /** 问题类型 */
     private String problemType;
 
-    /** 办理结果，关联sys_dict_item.item_code */
+    /** 办理结果 */
     private String handleResult;
 
     /** 办理过程/办理情况 */

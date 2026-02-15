@@ -1,30 +1,42 @@
 package com.sme.entity;
 
-
 import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * 包抓联问题办理记录实体类（和数据库表100%匹配）
+ */
 @Data
+
 public class SmePackageHandleRecord implements Serializable {
-    private static final long serialVersionUID = 1L;
-    /** 办理记录主键ID */
+    /** 主键ID */
+
     private Long id;
-    /** 关联包抓联主表ID（sme_package_contact.id） */
+
+    /** 关联问题ID（包抓联主表ID） */
     private Long packageId;
-    /** 本次办理领导（关联sme_package_contact.leader_name） */
-    private String handleLeader;
-    /** 本次办理时间 */
+
+    /** 办理时间 */
     private LocalDateTime handleTime;
-    /** 本次办理内容/跟进情况 */
+
+
+    /** 办理内容 */
     private String handleContent;
-    /** 办理类型：FOLLOW-跟进、COMMUNICATE-沟通、SUBMIT-提交材料、REPLY-回复企业等 */
+
+    /** 操作类型：ACCEPT(受理)/PROCESS(办理)/COMPLETE(办结)/UNABLE(无法办结) */
     private String handleType;
-    /** 办理附件URL（多个附件用逗号分隔） */
+
+    /** 附件URL（多个用逗号分隔） */
     private String attachUrl;
-    /** 记录创建时间 */
+
+    /** 创建时间（数据库默认CURRENT_TIMESTAMP） */
     private LocalDateTime createTime;
-    /** 逻辑删除：0-未删/1-已删 */
+
+    /** 更新时间（数据库自动更新） */
+    private LocalDateTime updateTime;
+
+    /** 删除标记：0-未删除 1-已删除 */
     private Integer delFlag;
 }

@@ -18,7 +18,7 @@ public class SmePackageContactDTO {
     /** 主键ID（自增） */
     private Long id;
 
-    /** 包抓联编号（系统自动生成） */
+    /** 问题编号（系统自动生成） */
     private String packageNo;
 
     /** 流程状态：UNHANDLED-未受理 HANDLING-办理中 COMPLETED-已办结 UNABLE-无法办理 */

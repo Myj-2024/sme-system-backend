@@ -26,52 +26,52 @@ public class SmePLE implements Serializable {
     private String leaderName;
 
     /**
-     * 包联企业ID（关联sme_enterprise.id）
+     * 包联企业ID
      */
     private Long enterpriseId;
 
     /**
-     * 企业名称（冗余字段）
+     * 企业名称
      */
     private String enterpriseName;
 
     /**
-     * 企业负责人（冗余字段，对应原表legal_person）
+     * 企业负责人
      */
     private String enterpriseLeader;
 
     /**
-     * 企业联系电话（冗余字段）
+     * 企业联系电话
      */
     private String enterprisePhone;
 
     /**
-     * 注册地址（冗余字段，对应原表business_addr）
+     * 注册地址
      */
     private String regAddr;
 
     /**
-     * 主要产品（冗余字段）
+     * 主要产品
      */
     private String mainProduct;
 
     /**
-     * 专班班长（冗余字段）
+     * 专班班长
      */
     private String classMonitor;
 
     /**
-     * 专班联系电话（冗余字段）
+     * 专班联系电话
      */
     private String classPhone;
 
     /**
-     * 专班负责单位ID（关联sys_dept.id）
+     * 专班负责单位ID
      */
     private Long classDeptId;
 
     /**
-     * 专班负责单位名称（冗余字段）
+     * 专班负责单位名称
      */
     private String classDeptName;
 

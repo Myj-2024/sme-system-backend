@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sme.mapper.SmePackageHandleRecordMapper">
+
+    <!-- 通用结果映射 -->
+    <resultMap id="SmePackageHandleRecordResultMap" type="com.sme.entity.SmePackageHandleRecord">
+        <id column="id" property="id"/>
+        <result column="package_id" property="packageId"/>
+        <result column="handle_time" property="handleTime"/>
+        <result column="handle_content" property="handleContent"/>
+        <result column="handle_type" property="handleType"/>
+        <result column="attach_url" property="attachUrl"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del_flag" property="delFlag"/>
+    </resultMap>
+
+    <!-- 插入办理记录 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO gh_sme_service.sme_package_handle_record
+        (
+            package_id,
+            handle_time,
+            handle_content,
+            handle_type,
+            attach_url,
+            create_time,
+            update_time,
+            del_flag
+        )
+        VALUES
+            (
+                #{packageId},
+                #{handleTime},
+                #{handleContent},
+                #{handleType},
+                #{attachUrl},
+                NOW(),
+                NOW(),
+                #{delFlag}
+            )
+    </insert>
+
+    <!-- 根据包抓联ID查询办理记录列表 -->
+    <select id="selectByPackageId" parameterType="java.lang.Long" resultMap="SmePackageHandleRecordResultMap">
+        SELECT
+            id,
+            package_id,
+            handle_time,
+            handle_content,
+            handle_type,
+            attach_url,
+            create_time,
+            update_time,
+            del_flag
+        FROM gh_sme_service.sme_package_handle_record
+        WHERE package_id = #{packageId} AND del_flag = 0
+        ORDER BY handle_time DESC
+    </select>
+
+    <!-- 根据ID查询办理记录 -->
+    <select id="selectById" parameterType="java.lang.Long" resultMap="SmePackageHandleRecordResultMap">
+        SELECT
+            id,
+            package_id,
+            handle_time,
+            handle_content,
+            handle_type,
+            attach_url,
+            create_time,
+            update_time,
+            del_flag
+        FROM gh_sme_service.sme_package_handle_record
+        WHERE id = #{id} AND del_flag = 0
+    </select>
+
+    <!-- 修改办理记录 -->
+    <update id="updateById">
+        UPDATE gh_sme_service.sme_package_handle_record
+        SET
+            handle_time = #{handleTime},
+            handle_content = #{handleContent},
+            handle_type = #{handleType},
+            attach_url = #{attachUrl},
+            update_time = NOW()
+        WHERE id = #{id} AND del_flag = 0
+    </update>
+
+    <!-- 核心修改：逻辑删除改为物理删除 -->
+    <delete id="deleteById">
+        DELETE FROM gh_sme_service.sme_package_handle_record
+        WHERE id = #{id}
+    </delete>
+
+</mapper>

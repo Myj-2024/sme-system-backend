@@ -595,7 +595,7 @@
 							<td>''</td>
 							<td>-</td>
 							<td>-</td>
-							<td>包抓联编号（GH_BZL_202502001）</td>
+							<td>问题编号（GH_BZL_202502001）</td>
 						</tr>
 						<tr>
 							<td>3</td>
@@ -1001,7 +1001,7 @@
 			<pre>
 <span class="sql-keyword">CREATE TABLE IF NOT EXISTS</span> sme_package_service (
     id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL AUTO_INCREMENT</span> COMMENT '主键ID（自增）',
-    package_no <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">DEFAULT</span> '' COMMENT '包抓联编号（系统自动生成）',
+    package_no <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">DEFAULT</span> '' COMMENT '问题编号（系统自动生成）',
     dept_id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '包联部门ID，关联sys_dept.id',
     leader_item_code <span class="sql-keyword">VARCHAR</span>(50) <span class="sql-keyword">NOT NULL</span> COMMENT '包联领导编码，关联sys_dict_item.item_code',
     enterprise_id <span class="sql-keyword">BIGINT UNSIGNED NOT NULL</span> COMMENT '包联企业ID，关联sme_enterprise.id',
