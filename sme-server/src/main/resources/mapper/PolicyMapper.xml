@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sme.mapper.PolicyMapper">
+
+    <!-- 政策表结果映射（关联字典项/用户表扩展字段） -->
+    <resultMap id="PolicyResultMap" type="com.sme.entity.Policy">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="policy_type" property="policyType" />
+        <result column="publisher_id" property="publisherId" />
+        <result column="content" property="content" />
+        <result column="publish_time" property="publishTime" />
+        <result column="is_top" property="isTop" />
+        <result column="is_show" property="isShow" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="del_flag" property="delFlag" />
+        <result column="policy_type_name" property="policyTypeName" />
+        <result column="publisher_name" property="publisherName" />
+    </resultMap>
+<!--    新增政策 -->
+    <insert id="insert" parameterType="com.sme.entity.Policy" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO gh_sme_service.sme_policy (
+            title,
+            policy_type,
+            publisher_id,  -- 新增：发布人姓名（核心字段）
+            content,
+            publish_time,
+            is_top,
+            is_show,
+            create_time,     -- 新增：创建时间（审计字段）
+            update_time      -- 新增：更新时间（审计字段）
+        ) VALUES (
+                     #{title},
+                     #{policyType},
+                     #{publisherId},  -- 对应前端传的发布人姓名
+                     #{content},
+                     #{publishTime},
+                     #{isTop},
+                     #{isShow},
+                     NOW(),             -- 数据库自动生成当前时间（避免前端传参不一致）
+                     NOW()              -- 新增时更新时间和创建时间一致
+                 )
+    </insert>
+
+    <!-- PageHelper 分页查询（无需手动分页，插件自动拼接 LIMIT） -->
+    <select id="pageQuery" parameterType="com.sme.dto.PolicyPageQueryDTO" resultMap="PolicyResultMap">
+        SELECT
+        p.id,
+        p.title,
+        p.policy_type,
+        p.publisher_id,
+        p.content,
+        p.publish_time,
+        p.is_top,
+        p.is_show,
+        p.create_time,
+        p.update_time,
+        p.del_flag,
+        di.item_name as policy_type_name,  <!-- 政策类型名称（字典项） -->
+        u.real_name as publisher_name       <!-- 发布人姓名（用户表） -->
+        FROM gh_sme_service.sme_policy p
+        <!-- 关联政策类型字典项（限定policy_type字典） -->
+        LEFT JOIN gh_sme_service.sys_dict_item di
+        ON p.policy_type = di.item_code
+        AND di.dict_id = (SELECT id FROM gh_sme_service.sys_dict WHERE dict_code = 'policy_type' AND del_flag = 0)
+        AND di.del_flag = 0
+        AND di.status = 1
+        <!-- 关联发布人用户表 -->
+        LEFT JOIN gh_sme_service.sys_user u
+        ON p.publisher_id = u.id
+        AND u.del_flag = 0
+        AND u.status = 1
+        WHERE p.del_flag = 0  <!-- 过滤已逻辑删除的政策 -->
+        <!-- 动态筛选条件（适配DTO所有字段） -->
+        <if test="title != null and title != ''">
+            AND p.title LIKE CONCAT('%', #{title}, '%')
+        </if>
+        <if test="policyType != null and policyType != ''">
+            AND p.policy_type = #{policyType}
+        </if>
+        <if test="publisherName != null and publisherName != ''">
+            AND u.real_name LIKE CONCAT('%', #{publisherName}, '%')
+        </if>
+        <if test="content != null and content != ''">
+            AND p.content LIKE CONCAT('%', #{content}, '%')
+        </if>
+        <if test="policyTypeName != null and policyTypeName != ''">
+            AND di.item_name LIKE CONCAT('%', #{policyTypeName}, '%')
+        </if>
+        <!-- 排序规则：置顶优先，发布时间倒序 -->
+        ORDER BY p.is_top DESC, p.publish_time DESC
+    </select>
+
+</mapper>

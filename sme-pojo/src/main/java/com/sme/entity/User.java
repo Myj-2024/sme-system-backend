@@ -44,9 +44,9 @@ public class User implements Serializable {
     private String phone = "";
 
     /**
-     * 所属部门ID，关联sys_dept表
+     * 所属部门编码
      */
-    private Long deptId;
+    private String deptCode;
 
     /**
      * 部门名称

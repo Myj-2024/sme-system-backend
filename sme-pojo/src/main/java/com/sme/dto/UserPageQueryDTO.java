@@ -49,9 +49,9 @@ public class UserPageQueryDTO implements Serializable {
     private String deptName;
 
     /**
-     * 所属部门ID，关联sys_dept表
+     * 所属部门编码
      */
-    private Long deptId;
+    private String deptCode;
 
     /**
      * 创建时间
