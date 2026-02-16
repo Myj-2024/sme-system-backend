@@ -20,28 +20,30 @@
     </resultMap>
 <!--    新增政策 -->
     <insert id="insert" parameterType="com.sme.entity.Policy" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO gh_sme_service.sme_policy (
-            title,
-            policy_type,
-            publisher_id,  -- 新增：发布人姓名（核心字段）
-            content,
-            publish_time,
-            is_top,
-            is_show,
-            create_time,     -- 新增：创建时间（审计字段）
-            update_time      -- 新增：更新时间（审计字段）
-        ) VALUES (
-                     #{title},
-                     #{policyType},
-                     #{publisherId},  -- 对应前端传的发布人姓名
-                     #{content},
-                     #{publishTime},
-                     #{isTop},
-                     #{isShow},
-                     NOW(),             -- 数据库自动生成当前时间（避免前端传参不一致）
-                     NOW()              -- 新增时更新时间和创建时间一致
-                 )
+        INSERT INTO gh_sme_service.sme_policy(title,policy_type,publisher_id,is_show,content,publish_time,is_top,create_time, update_time)
+        VALUES (#{title},#{policyType},#{publisherId},#{isShow},#{content},#{publishTime},#{isTop}, NOW(),NOW())
     </insert>
+        <!--修改政策-->
+    <update id="updatePolicy">
+        update sme_policy
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="policyType != null">policy_type = #{policyType},</if>
+            <if test="publisherId != null">publisher_id = #{publisherId},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="publishTime != null">publish_time = #{publishTime},</if>
+            <if test="isTop != null">is_top = #{isTop},</if>
+            <if test="isShow != null">
+                is_show = #{isShow},
+                <if test="isShow == 0">del_flag = 1,</if>
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+<!--    删除政策-->
+    <delete id="deletePolicy">
+            delete from gh_sme_service.sme_policy where id = #{id}
+    </delete>
 
     <!-- PageHelper 分页查询（无需手动分页，插件自动拼接 LIMIT） -->
     <select id="pageQuery" parameterType="com.sme.dto.PolicyPageQueryDTO" resultMap="PolicyResultMap">
@@ -57,22 +59,24 @@
         p.create_time,
         p.update_time,
         p.del_flag,
-        di.item_name as policy_type_name,  <!-- 政策类型名称（字典项） -->
-        u.real_name as publisher_name       <!-- 发布人姓名（用户表） -->
+        di.item_name as policy_type_name,
+        u.real_name as publisher_name
         FROM gh_sme_service.sme_policy p
-        <!-- 关联政策类型字典项（限定policy_type字典） -->
         LEFT JOIN gh_sme_service.sys_dict_item di
         ON p.policy_type = di.item_code
         AND di.dict_id = (SELECT id FROM gh_sme_service.sys_dict WHERE dict_code = 'policy_type' AND del_flag = 0)
         AND di.del_flag = 0
         AND di.status = 1
-        <!-- 关联发布人用户表 -->
         LEFT JOIN gh_sme_service.sys_user u
         ON p.publisher_id = u.id
         AND u.del_flag = 0
         AND u.status = 1
-        WHERE p.del_flag = 0  <!-- 过滤已逻辑删除的政策 -->
-        <!-- 动态筛选条件（适配DTO所有字段） -->
+        WHERE 1=1  <!-- 替换原有的p.del_flag=0 -->
+        <!-- 新增动态条件：默认过滤已隐藏，传showHidden=true则显示所有 -->
+        <if test="showHidden != null and showHidden == false">
+            AND p.del_flag = 0
+        </if>
+        <!-- 原有动态筛选条件不变 -->
         <if test="title != null and title != ''">
             AND p.title LIKE CONCAT('%', #{title}, '%')
         </if>
@@ -88,8 +92,29 @@
         <if test="policyTypeName != null and policyTypeName != ''">
             AND di.item_name LIKE CONCAT('%', #{policyTypeName}, '%')
         </if>
-        <!-- 排序规则：置顶优先，发布时间倒序 -->
         ORDER BY p.is_top DESC, p.publish_time DESC
+    </select>
+
+<!--    根据id查询政策-->
+    <select id="getPolicyById" resultMap="PolicyResultMap">
+        select * from gh_sme_service.sme_policy where id = #{id}
+    </select>
+
+    <!-- 修正批量显示的参数名：collection="list" 匹配List<Long>入参 -->
+    <update id="batchShowPolicies">
+        update gh_sme_service.sme_policy  <!-- 补充库名，和其他SQL保持一致 -->
+        set is_show = 1,
+        del_flag = 0  <!-- 显示时恢复逻辑未删除状态 -->
+        where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 新增：查询所有已隐藏政策ID（del_flag=1 且 is_show=0） -->
+    <select id="selectHiddenPolicyIds" resultType="java.lang.Long">
+        SELECT id FROM gh_sme_service.sme_policy
+        WHERE del_flag = 1 AND is_show = 0
     </select>
 
 </mapper>

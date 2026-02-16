@@ -41,4 +41,6 @@ public class PolicyPageQueryDTO implements Serializable {
      */
     private String policyTypeName;
 
+    // 新增：是否显示已隐藏数据（默认false）
+    private Boolean showHidden = false;
 }

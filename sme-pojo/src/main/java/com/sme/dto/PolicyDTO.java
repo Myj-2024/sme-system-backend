@@ -61,5 +61,6 @@ public class PolicyDTO implements Serializable {
      * 发布人姓名（从sys_user.real_name获取）
      */
     private String publisherName;
+
 }
 
