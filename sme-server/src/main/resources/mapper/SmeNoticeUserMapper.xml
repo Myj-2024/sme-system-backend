@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sme.mapper.SmeNoticeUserMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="SmeNoticeUserResultMap" type="com.sme.entity.SmeNoticeUser">
+        <id column="id" property="id" />
+        <result column="notice_id" property="noticeId" />
+        <result column="user_id" property="userId" />
+        <result column="is_read" property="isRead" />
+        <result column="read_time" property="readTime" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 批量插入通知-用户关联记录 -->
+    <insert id="batchInsert">
+        INSERT INTO gh_sme_service.sme_notice_user (
+        notice_id, user_id, is_read, create_time
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.noticeId}, #{item.userId}, 0, NOW())
+        </foreach>
+    </insert>
+
+    <!-- 标记通知已读 -->
+    <update id="markAsRead">
+        UPDATE gh_sme_service.sme_notice_user
+        SET is_read = 1, read_time = NOW()
+        WHERE notice_id = #{noticeId} AND user_id = #{userId} AND is_read = 0
+    </update>
+
+    <!-- 查询用户未读通知数量 -->
+    <select id="countUnread" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM gh_sme_service.sme_notice_user
+        WHERE user_id = #{userId} AND is_read = 0
+    </select>
+
+    <!-- 根据通知ID删除关联记录 -->
+    <delete id="deleteByNoticeId">
+        DELETE FROM gh_sme_service.sme_notice_user
+        WHERE notice_id = #{noticeId}
+    </delete>
+</mapper>

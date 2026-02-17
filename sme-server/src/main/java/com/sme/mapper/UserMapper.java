@@ -44,4 +44,9 @@ public interface UserMapper{
      * 分页查询用户列表信息
      */
     Page<User> pageQuery(UserPageQueryDTO userPageQueryDTO);
+
+    /**
+     * 查询所有有效用户ID（未删除）
+     */
+    List<Long> listAllValidUserId();
 }
