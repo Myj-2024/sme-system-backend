@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sme.mapper.IconMapper">
+
+    <resultMap id="iconResultMap" type="com.sme.entity.Icon">
+        <id column="id" property="id" />
+        <result column="icon_name" property="iconName" />
+        <result column="icon_code" property="iconCode" />
+        <result column="icon_url" property="iconUrl" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="del_flag" property="delFlag" />
+    </resultMap>
+
+<!--    新增图标-->
+    <insert id="add">
+        INSERT INTO sys_icon(icon_name, icon_code, icon_url, create_time, update_time)
+        VALUES(#{iconName}, #{iconCode}, #{iconUrl},  NOW(), NOW())
+    </insert>
+<!--    修改图标-->
+    <update id="update">
+        UPDATE sys_icon
+        <set>
+            <if test="iconName != null">
+                icon_name = #{iconName},
+            </if>
+            <if test="iconCode != null">
+                icon_code = #{iconCode},
+            </if>
+            <if test="iconUrl != null">
+                icon_url = #{iconUrl},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+<!--    删除图标-->
+    <delete id="delete">
+        DELETE FROM sys_icon
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 分页查询-->
+    <select id="pageQuery" resultMap="iconResultMap">
+        SELECT * FROM sys_icon
+        WHERE del_flag = 0
+        <if test="iconName != null and iconName != ''">
+            AND icon_name LIKE CONCAT('%', #{iconName}, '%')
+        </if>
+        <if test="iconCode != null and iconCode != ''">
+            AND icon_code LIKE CONCAT('%', #{iconCode}, '%')
+        </if>
+        ORDER BY id
+    </select>
+<!--        根据ID查询-->
+    <select id="getById" resultMap="iconResultMap">
+            select * from sys_icon where id=#{id}
+    </select>
+<!--    编码唯一性校验-->
+    <select id="checkIconCodeUnique" resultType="java.lang.Integer">
+        select count(1) from sys_icon
+        where icon_code=#{iconCode} and del_flag=0
+        <if test="id != null">
+            and id != #{id} <!-- 编辑时排除自身ID -->
+        </if>
+    </select>
+</mapper>

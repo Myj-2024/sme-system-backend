@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/admin/notice")
 @Slf4j
@@ -86,7 +87,6 @@ public class SmeNoticeController {
     @Operation(summary = "获取当前用户通知列表")
     public Result<PageResult> myNotice(@RequestParam Integer pageNum,
                                        @RequestParam Integer pageSize) {
-        // 核心修复：改用项目统一的UserContext获取用户ID（避免操作SecurityContextHolder的错误）
         Long userId = UserContext.getUserId();
         if (userId == null) {
             return Result.error("未登录");
@@ -95,4 +95,5 @@ public class SmeNoticeController {
         PageResult page = smeNoticeService.queryMyNotice(userId, pageNum, pageSize);
         return Result.success(page);
     }
+
 }

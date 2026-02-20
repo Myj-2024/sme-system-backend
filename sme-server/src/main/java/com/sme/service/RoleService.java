@@ -4,24 +4,23 @@ import com.sme.dto.RoleDTO;
 import com.sme.dto.RolePageQueryDTO;
 import com.sme.entity.Role;
 import com.sme.result.PageResult;
+import com.sme.result.Result;
 
 import java.util.List;
 
 public interface RoleService {
 
-    PageResult findRolesByUserId(RolePageQueryDTO rolePageQueryDTO);
+    PageResult page(RolePageQueryDTO rolePageQueryDTO);
 
-    Role findById(Long id);
+    Result<List<Role>> selectAllRoles();
 
-    List<Role> findAll();
 
-    void createRole(RoleDTO roleDTO);
+    Result<Void> add(Role role);
 
-    void updateRole(RoleDTO roleDTO);
 
-    void deleteRole(Long id);
+    Result<Void> update(Role role);
 
-    List<Long> getRolePermissionIds(Long roleId);
+    Result<Role> getById(Long id);
 
-    void assignPermissions(Long roleId, List<Long> permissionIds);
+    Result<Void> delete(Long id);
 }

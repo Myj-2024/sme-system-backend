@@ -1,4 +1,4 @@
-package com.sme.utils;
+package com.sme.handler;
 
 
 import org.apache.ibatis.type.BaseTypeHandler;

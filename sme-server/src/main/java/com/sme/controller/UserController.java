@@ -1,23 +1,16 @@
 package com.sme.controller;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+
 import com.sme.constant.MessageConstant;
 import com.sme.dto.UserPageQueryDTO;
-import com.sme.entity.SysPermission;
 import com.sme.entity.User;
 import com.sme.exception.BaseException;
 import com.sme.result.PageResult;
 import com.sme.result.Result;
 import com.sme.result.ResultCode;
-import com.sme.service.PermissionService;
 import com.sme.service.UserService;
-import com.sme.utils.PageUtils;
 import com.sme.utils.UserContext;
-import com.sme.annotation.RequirePermission;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,21 +24,17 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin/user")
 @Tag(name = "用户管理", description = "用户管理接口")
-//@RequirePermission("sys:user:manage") // 类级别：进入用户管理模块的基本权限
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private PermissionService permissionService;
 
     /**
      * 获取所有用户
      * @return
      */
     @GetMapping
-    @RequirePermission("sys:user:list")
     @Operation(summary = "获取所有用户", description = "返回所有用户列表")
     public Result<List<User>> getAllUsers() {
         List<User> userList = userService.findAll();
@@ -61,7 +50,6 @@ public class UserController {
      * @return
      */
     @GetMapping("/{id}")
-    @RequirePermission("sys:user:list")
     @Operation(summary = "获取用户信息", description = "返回用户信息")
     public Result<User> getUserById(@PathVariable Long id) {
         User user = userService.findById(id);
@@ -79,7 +67,6 @@ public class UserController {
      */
     @GetMapping("/page")
     @Operation(summary = "分页查询", description = "分页查询用户列表")
-    @RequirePermission("sys:user:list")
     public Result<PageResult> getUserPage(UserPageQueryDTO userPageQueryDTO) {
             log.info("分页查询用户列表：{}", userPageQueryDTO);
             PageResult page =userService.pageQuery(userPageQueryDTO);
@@ -93,7 +80,6 @@ public class UserController {
      * @return
      */
     @PostMapping("")
-    @RequirePermission("sys:user:add")
     @Operation(summary = "新增用户", description = "返回用户信息")
     public Result insertUser(@RequestBody User user) {
         boolean result = userService.insert(user);
@@ -109,7 +95,6 @@ public class UserController {
      * @return
      */
     @PutMapping("/{id}")
-    @RequirePermission("sys:user:edit")
     @Operation(summary = "修改用户", description = "返回用户信息")
     public Result updateUser(@PathVariable Long id, @RequestBody User user) {
         user.setId(id);
@@ -126,7 +111,6 @@ public class UserController {
      * @return
      */
     @DeleteMapping("/{id}")
-    @RequirePermission("sys:user:delete")
     @Operation(summary = "删除用户", description = "返回删除结果")
     public Result deleteUser(@PathVariable Long id) {
         boolean result = userService.deleteById(id);
@@ -143,7 +127,6 @@ public class UserController {
      * @return
      */
     @PostMapping("/status/{status}")
-    @RequirePermission("sys:user:edit")
     @Operation(summary = "修改用户状态", description = "返回修改结果")
     public Result updateUserStatus(@PathVariable Integer status, @RequestParam Long id) {
         log.info("修改用户状态：{}", status);
@@ -159,26 +142,7 @@ public class UserController {
         }
     }
 
-    /**
-     * 获取用户角色ID列表
-     */
-    @GetMapping("/{userId}/roles")
-    @RequirePermission("sys:user:list")
-    @Operation(summary = "获取用户角色ID列表", description = "返回用户角色ID列表")
-    public Result<List<Long>> getUserRoles(@PathVariable Long userId) {
-        return Result.success(userService.getRoleIdsByUserId(userId));
-    }
 
-    /**
-     * 分配角色
-     */
-    @PostMapping("/{userId}/roles")
-    @RequirePermission("sys:role:manage")
-    @Operation(summary = "分配角色", description = "返回分配结果")
-    public Result<Void> assignRoles(@PathVariable Long userId, @RequestBody List<Long> roleIds) {
-        userService.assignRoles(userId, roleIds);
-        return Result.success();
-    }
 
     /**
      * 获取当前用户信息
@@ -201,18 +165,8 @@ public class UserController {
         // 安全起见：抹除密码哈希值，不传给前端
         user.setPassword(null);
 
-        // 3. 核心：获取该用户的动态菜单树 (用于左侧菜单栏)
-        List<SysPermission> menuTree = permissionService.findUserMenuTree(userId);
-
-        // 4. 核心：获取该用户的权限标识符集合 (用于按钮 v-if 控制)
-        List<String> permissionCodes = permissionService.findUserPermissionCodes(userId);
-
-        // 5. 封装返回
         Map<String, Object> data = new HashMap<>();
         data.put("user", user);
-        data.put("menus", menuTree);           // 前端动态路由渲染数据
-        data.put("permissions", permissionCodes); // 按钮级别权限标识
-
         return Result.success(data);
     }
 }

@@ -1,39 +1,19 @@
 package com.sme.service;
 
+import com.sme.dto.PermissionPageQueryDTO;
 import com.sme.entity.SysPermission;
-import com.sme.entity.SysPermission;
-import org.apache.ibatis.annotations.Param;
+import com.sme.result.PageResult;
+import com.sme.result.Result;
 
-import java.util.List;
-
-/**
- * 权限服务
- */
 public interface PermissionService {
+    // 修改：返回PageResult分页对象（对齐用户管理）
+    PageResult getPermissions(PermissionPageQueryDTO pageDTO);
 
-    List<SysPermission> findPermissionsByRoleId(Long roleId);
+    SysPermission getPermissionById(Long id);
 
-    List<SysPermission> findPermissionsByUserId(Long userId);
+    Result<SysPermission> addPermission(SysPermission permission);
 
-    SysPermission findByCode(String code);
+    Result<SysPermission> updatePermission(SysPermission permission);
 
-    Boolean hasPermission(Long userId, String permissionCode);
-
-    void createPermission(SysPermission permission);
-
-    void updatePermission(SysPermission permission);
-
-    void deletePermission(Long id);
-
-    List<SysPermission> findAll();
-
-    /**
-     * 获取当前用户的动态菜单树
-     */
-    List<SysPermission> findUserMenuTree(Long userId);
-
-    /**
-     * 获取当前用户的权限标识集合
-     */
-    List<String> findUserPermissionCodes(Long userId);
+    Result<SysPermission> deletePermission(Long id);
 }

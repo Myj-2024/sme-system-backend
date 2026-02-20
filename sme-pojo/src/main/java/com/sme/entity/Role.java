@@ -50,11 +50,6 @@ public class Role{
     private String description;
 
     /**
-     * 状态
-     */
-    private Integer status;
-
-    /**
      * 权限列表
      */
     private List<Permission> permissions;

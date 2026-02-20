@@ -1,6 +1,7 @@
 package com.sme.mapper;
 
-import com.sme.entity.SysPermission;
+import com.github.pagehelper.Page;
+import com.sme.dto.PermissionPageQueryDTO;
 import com.sme.entity.SysPermission;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -13,37 +14,22 @@ import java.util.List;
 @Mapper
 public interface PermissionMapper {
 
-    // 根据角色ID查询权限列表
-    List<SysPermission> findPermissionsByRoleId(@Param("roleId") Long roleId);
+    // 修改：返回Page类型，适配PageHelper分页
+    Page<SysPermission> getPermissions(PermissionPageQueryDTO pageDTO);
 
-    // 根据用户ID查询权限列表
-    List<SysPermission> findPermissionsByUserId(@Param("userId") Long userId);
+    SysPermission getPermissionById(Long id);
 
-    // 根据权限编码查询权限信息
-    SysPermission findByCode(@Param("code") String code);
+    void addPermission(SysPermission permission);
 
-    // 插入权限
-    void insert(SysPermission permission);
+    int updatePermission(SysPermission permission);
 
-    // 更新权限
-    void update(SysPermission permission);
+    int deletePermission(Long id);
 
-    // 删除权限
-    void delete(@Param("id") Long id);
+
+    int checkPathUnique(String path);
 
     /**
-     * 查询所有权限列表
+     * 查询所有未删除的菜单权限（供管理员使用）
      */
-    List<SysPermission> findAll();
-
-    /**
-     * 根据用户ID查询菜单类型的权限 (用于动态菜单)
-     */
-    List<SysPermission> selectMenuByUserId(@Param("userId") Long userId);
-
-    /**
-     * 根据用户ID查询所有权限编码 (用于按钮权限控制)
-     */
-    List<String> selectPermissionCodesByUserId(@Param("userId") Long userId);
+    List<SysPermission> selectAllPermissions();
 }
-

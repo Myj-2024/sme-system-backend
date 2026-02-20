@@ -1,6 +1,5 @@
 package com.sme.config;
 
-import com.sme.interceptor.PermissionInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +20,7 @@ public class MybatisConfig implements WebMvcConfigurer {
     @Autowired
     private JwtInterceptor jwtInterceptor;
 
-    @Autowired
-    private PermissionInterceptor permissionInterceptor;
+
 
 
     /**
@@ -38,11 +36,6 @@ public class MybatisConfig implements WebMvcConfigurer {
                 // 排除登录接口
                 .excludePathPatterns("/admin/auth/login");
 
-        // 添加权限拦截器
-        registry.addInterceptor(permissionInterceptor)
-                // 拦截所有请求路径
-                //注意：拦截器执行顺序按照添加顺序执行，添加的越早越先执行
-                .addPathPatterns("/admin/**");
     }
 
 }

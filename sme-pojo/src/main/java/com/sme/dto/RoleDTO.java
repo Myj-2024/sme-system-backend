@@ -12,7 +12,6 @@ public class RoleDTO {
     private String roleName;    // 将 name 改为 roleName
     private String roleCode;         // 角色编码
     private String description;    // 描述
-    private Integer status;        // 状态
     private Byte delFlag;          // 逻辑删除
     private Date createTime;       // 创建时间
     private Date updateTime;       // 更新时间

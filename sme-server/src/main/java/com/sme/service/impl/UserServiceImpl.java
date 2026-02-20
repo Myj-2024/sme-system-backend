@@ -24,8 +24,8 @@ import java.util.List;
 
 
 /**
- * 用户服务实现类（修复版）
- * 解决JwtUtil静态调用、密码加密工具冗余、日志缺失问题
+ * 用户服务实现
+ *
  */
 @Slf4j
 @Service
@@ -43,7 +43,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRoleMapper userRoleMapper;
 
-    // 修复：注入实例化的JwtUtil（不再静态调用）
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -138,9 +137,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserWithRoleById(Long userId) {
         User user = userMapper.findById(userId);
-        if (user != null){
-            user.setRoles(roleMapper.findRolesByUserId(userId));
-        }
+//        if (user != null){
+//            user.setRoles(roleMapper.findRolesByUserId(userId));
+//        }
         return user;
     }
 
@@ -168,22 +167,6 @@ public class UserServiceImpl implements UserService {
         userMapper.update(user);
     }
 
-    @Override
-    public List<Long> getRoleIdsByUserId(Long userId) {
-        return userRoleMapper.findRoleIdsByUserId(userId);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class) // 开启事务
-    public void assignRoles(Long userId, List<Long> roleIds) {
-        // 1. 先删除该用户旧的所有角色关联
-        userRoleMapper.deleteByUserId(userId);
-
-        // 2. 如果前端传来的角色列表不为空，则批量插入新关联
-        if (roleIds != null && !roleIds.isEmpty()) {
-            userRoleMapper.batchInsert(userId, roleIds);
-        }
-    }
 
     /**
      * 分页查询用户

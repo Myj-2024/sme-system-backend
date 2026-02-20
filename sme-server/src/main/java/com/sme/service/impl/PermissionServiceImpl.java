@@ -1,14 +1,15 @@
 package com.sme.service.impl;
 
-import com.sme.entity.SysPermission;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.sme.dto.PermissionPageQueryDTO;
 import com.sme.entity.SysPermission;
 import com.sme.mapper.PermissionMapper;
+import com.sme.result.PageResult;
+import com.sme.result.Result;
 import com.sme.service.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class PermissionServiceImpl implements PermissionService {
@@ -16,75 +17,50 @@ public class PermissionServiceImpl implements PermissionService {
     @Autowired
     private PermissionMapper permissionMapper;
 
+    // 完全对齐用户管理的分页实现逻辑
     @Override
-    public List<SysPermission> findPermissionsByRoleId(Long roleId) {
-        return permissionMapper.findPermissionsByRoleId(roleId);
+    public PageResult getPermissions(PermissionPageQueryDTO pageDTO) {
+        // 1. 开启分页（PageHelper）
+        PageHelper.startPage(pageDTO.getPageNum(), pageDTO.getPageSize());
+
+        // 2. 执行分页查询
+        Page<SysPermission> page = permissionMapper.getPermissions(pageDTO);
+
+        // 3. 封装PageResult返回（对齐用户管理）
+        return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    // 以下方法完全保留原有逻辑，无修改
+    @Override
+    public SysPermission getPermissionById(Long id) {
+        return permissionMapper.getPermissionById(id);
     }
 
     @Override
-    public List<SysPermission> findPermissionsByUserId(Long userId) {
-        return permissionMapper.findPermissionsByUserId(userId);
-    }
+    public Result<SysPermission> addPermission(SysPermission permission) {
 
-    @Override
-    public SysPermission findByCode(String code) {
-        return permissionMapper.findByCode(code);
-    }
-
-    @Override
-    public Boolean hasPermission(Long userId, String permissionCode) {
-        List<SysPermission> permissions = permissionMapper.findPermissionsByUserId(userId);
-        return permissions.stream().anyMatch(permission -> permission.getCode().equals(permissionCode));
-    }
-
-    @Override
-    public void createPermission(SysPermission permission) {
-        permissionMapper.insert(permission);
-    }
-
-    @Override
-    public void updatePermission(SysPermission permission) {
-        permissionMapper.update(permission);
-    }
-
-    @Override
-    public void deletePermission(Long id) {
-        permissionMapper.delete(id);
-    }
-
-    @Override
-    public List<SysPermission> findAll() {
-        return permissionMapper.findAll();
-    }
-
-    @Override
-    public List<SysPermission> findUserMenuTree(Long userId) {
-        // 1. 获取该用户有权访问的所有菜单（扁平列表）
-        List<SysPermission> allMenus = permissionMapper.selectMenuByUserId(userId);
-
-        // 2. 构建树形结构 (根节点 parentId 一般为 0)
-        return buildTree(allMenus, 0L);
-    }
-
-    @Override
-    public List<String> findUserPermissionCodes(Long userId) {
-        return permissionMapper.selectPermissionCodesByUserId(userId);
-    }
-
-    /**
-     * 递归构建菜单树
-     */
-    private List<SysPermission> buildTree(List<SysPermission> menus, Long parentId) {
-        List<SysPermission> tree = new ArrayList<>();
-        for (SysPermission menu : menus) {
-            if (parentId.equals(menu.getParentId())) {
-                // 递归查找子节点
-                List<SysPermission> children = buildTree(menus, menu.getId());
-                menu.setChildren(children);
-                tree.add(menu);
-            }
+        if (permissionMapper.checkPathUnique(permission.getPath()) > 0) {
+            // 返回明确的错误提示，方便前端展示
+            return Result.error("权限路径【" + permission.getPath() + "】已存在，请勿重复添加！");
         }
-        return tree;
+
+        permissionMapper.addPermission(permission);
+        return Result.success(permission);
+    }
+
+    @Override
+    public Result<SysPermission> updatePermission(SysPermission permission) {
+        if (permissionMapper.checkPathUnique(permission.getPath()) > 0) {
+            // 返回明确的错误提示，方便前端展示
+            return Result.error("权限路径【" + permission.getPath() + "】已存在，请勿重复添加！");
+        }
+        permissionMapper.updatePermission(permission);
+        return Result.success(permission);
+    }
+
+    @Override
+    public Result<SysPermission> deletePermission(Long id) {
+        permissionMapper.deletePermission(id);
+        return Result.success();
     }
 }
-

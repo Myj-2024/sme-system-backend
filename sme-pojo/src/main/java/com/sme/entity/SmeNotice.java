@@ -42,10 +42,6 @@ public class SmeNotice implements Serializable {
      */
     private LocalDateTime publishTime;
 
-    /**
-     * 是否置顶：0-否 / 1-是
-     */
-    private Integer isTop;
 
     /**
      * 创建时间

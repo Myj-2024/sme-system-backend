@@ -40,10 +40,6 @@ public class SmeNoticeDTO implements Serializable {
      */
     private LocalDateTime publishTime;
 
-    /**
-     * 是否置顶：0-否 / 1-是
-     */
-    private Integer isTop;
 
     /**
      * 逻辑删除：0-未删 / 1-已删

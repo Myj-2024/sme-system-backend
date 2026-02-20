@@ -14,7 +14,6 @@ import java.util.UUID;
 @Slf4j
 public class MinioUtil {
 
-
     // 直接从配置文件注入MinIO配置项（关键修复）
     @Value("${minio.endpoint}")
     private String endpoint;
@@ -72,12 +71,22 @@ public class MinioUtil {
      */
     private String getContentType(String suffix) {
         String contentType;
-        switch (suffix.toLowerCase()) {
+        // 统一转为小写，避免大小写问题（如.SVG/.Svg）
+        String lowerSuffix = suffix.toLowerCase();
+        switch (lowerSuffix) {
             case ".jpg":
             case ".jpeg":
+                contentType = "image/jpeg"; // 统一jpg/jpeg为image/jpeg（更标准）
+                break;
             case ".png":
+                contentType = "image/png";
+                break;
             case ".gif":
-                contentType = "image/" + suffix.substring(1);
+                contentType = "image/gif";
+                break;
+            // 新增：SVG格式的正确MIME类型
+            case ".svg":
+                contentType = "image/svg+xml";
                 break;
             case ".pdf":
                 contentType = "application/pdf";

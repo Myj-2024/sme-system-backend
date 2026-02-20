@@ -1,88 +1,69 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sme.mapper.PermissionMapper">
-             <!--    结果映射-->
+
+    <!-- 结果映射 -->
     <resultMap id="PermissionResultMap" type="com.sme.entity.SysPermission">
         <id column="id" property="id" />
         <result column="name" property="name" />
         <result column="code" property="code" />
         <result column="type" property="type" />
-        <result column="parentId" property="parentId" />
         <result column="path" property="path" />
-        <result column="component" property="component" />
         <result column="icon" property="icon" />
         <result column="sort" property="sort" />
-        <result column="status" property="status" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
+        <result column="del_flag" property="delFlag" />
     </resultMap>
 
-        <!-- 查询角色的权限 -->
-        <select id="findPermissionsByRoleId" parameterType="long" resultMap="PermissionResultMap">
-            SELECT * FROM sys_permission
-                              INNER JOIN role_permission ON sys_permission.id = role_permission.permission_id
-            WHERE role_permission.role_id = #{roleId} AND sys_permission.status = 1
-        </select>
-
-        <!-- 查询用户的权限 -->
-    <select id="findPermissionsByUserId" parameterType="long" resultMap="PermissionResultMap">
-        SELECT DISTINCT p.* FROM sys_permission p
-                                     INNER JOIN role_permission rp ON p.id = rp.permission_id
-                                     INNER JOIN user_role ur ON rp.role_id = ur.role_id
-                                     INNER JOIN sys_role r ON ur.role_id = r.id
-        WHERE ur.user_id = #{userId}
-          AND p.status = 1
-          AND r.status = 1  </select>
-
-        <!-- 根据权限编码查询权限 -->
-        <select id="findByCode" resultType="com.sme.entity.SysPermission">
-            SELECT * FROM sys_permission WHERE code = #{code} AND status = 1
-        </select>
-
-        <!-- 插入权限 -->
-        <insert id="insert" parameterType="com.sme.entity.SysPermission">
-            INSERT INTO sys_permission (name, code, path, component, icon, status, type, parent_id, sort)
-            VALUES (#{name}, #{code}, #{path}, #{component}, #{icon}, #{status}, #{type}, #{parentId}, #{sort})
-        </insert>
-
-        <!-- 更新权限 -->
-        <update id="update" parameterType="com.sme.entity.SysPermission">
-            UPDATE sys_permission
-            SET name = #{name}, code = #{code}, path = #{path}, component = #{component},
-                icon = #{icon}, status = #{status}, type = #{type}, parent_id = #{parentId}, sort = #{sort}
-            WHERE id = #{id}
-        </update>
-
-        <!-- 删除权限 -->
-        <delete id="delete" parameterType="long">
-            DELETE FROM sys_permission WHERE id = #{id}
-        </delete>
-
-    <select id="findAll" resultType="com.sme.entity.SysPermission">
-        SELECT * FROM sys_permission WHERE del_flag = 0
+    <!-- 分页查询 -->
+    <select id="getPermissions" resultMap="PermissionResultMap">
+        SELECT * FROM sys_permission
+        WHERE del_flag = 0
+        <if test="name != null and name != ''">
+            AND name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="code != null and code != ''">
+            AND code LIKE CONCAT('%', #{code}, '%')
+        </if>
+        ORDER BY sort
     </select>
 
-    <select id="selectMenuByUserId" resultType="com.sme.entity.SysPermission">
-        SELECT DISTINCT p.*
-        FROM sys_permission p
-                 INNER JOIN role_permission rp ON p.id = rp.permission_id
-                 INNER JOIN user_role ur ON rp.role_id = ur.role_id
-        WHERE ur.user_id = #{userId}
-          AND p.type = 1
-          AND p.status = 1
-          AND p.del_flag = 0
-        ORDER BY p.sort ASC
+    <!-- 根据id查询 -->
+    <select id="getPermissionById" resultMap="PermissionResultMap">
+        SELECT * FROM sys_permission WHERE id = #{id}
     </select>
 
-    <select id="selectPermissionCodesByUserId" resultType="java.lang.String">
-        SELECT DISTINCT p.code
-        FROM sys_permission p
-                 INNER JOIN role_permission rp ON p.id = rp.permission_id
-                 INNER JOIN user_role ur ON rp.role_id = ur.role_id
-        WHERE ur.user_id = #{userId}
-          AND p.status = 1
-          AND p.del_flag = 0
-          AND p.code IS NOT NULL AND p.code != ''
+    <!-- 新增 -->
+    <insert id="addPermission">
+        INSERT INTO sys_permission (name, code, type, path, icon, sort, create_time, del_flag)
+        VALUES (#{name}, #{code}, #{type}, #{path}, #{icon}, #{sort}, CURRENT_TIMESTAMP, 0)
+    </insert>
+
+    <!-- 更新 -->
+    <update id="updatePermission">
+        UPDATE sys_permission
+        SET name = #{name}, code = #{code}, type = #{type}, path = #{path}, icon = #{icon},
+            sort = #{sort}, update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除（逻辑删除） -->
+    <update id="deletePermission">
+        UPDATE sys_permission
+        SET del_flag = 1, update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <!-- 新增：路径唯一性校验SQL -->
+    <select id="checkPathUnique" resultType="int">
+        SELECT COUNT(1) FROM sys_permission WHERE path = #{path} AND del_flag = 0
+    </select>
+
+    <select id="selectAllPermissions" resultMap="PermissionResultMap">
+        SELECT * FROM sys_permission
+        WHERE del_flag = 0
+        ORDER BY sort ASC
     </select>
 
 </mapper>

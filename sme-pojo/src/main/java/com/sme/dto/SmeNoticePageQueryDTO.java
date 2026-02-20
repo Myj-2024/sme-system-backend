@@ -45,11 +45,6 @@ public class SmeNoticePageQueryDTO implements Serializable {
     private LocalDateTime publishTime;
 
     /**
-     * 是否置顶：0-否 / 1-是
-     */
-    private Integer isTop;
-
-    /**
      * 发布人姓名
      */
     private String publisherName;

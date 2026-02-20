@@ -8,86 +8,25 @@
         <result column="role_name" property="roleName" />
         <result column="role_code" property="roleCode" />
         <result column="description" property="description" />
-        <result column="status" property="status" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
     </resultMap>
-
-    <!-- 根据用户ID查询关联角色（仅查启用状态） -->
-    <select id="findRolesByUserId" parameterType="long" resultMap="RoleResultMap">
-        select r.* from sys_role r
-                            inner join user_role ur on r.id = ur.role_id
-        where ur.user_id = #{userId} and r.status = 1
-    </select>
-
-    <!-- 根据ID查询角色（仅查启用状态） -->
-    <select id="findById" parameterType="long" resultMap="RoleResultMap">
-        select * from sys_role where id = #{id} and status = 1
-    </select>
-
-    <!-- 查询所有启用状态的角色 -->
-    <select id="findAll" resultMap="RoleResultMap">
-        select * from sys_role where status = 1
-    </select>
-
-    <!-- 新增角色 -->
-    <insert id="insert" parameterType="com.sme.entity.Role" useGeneratedKeys="true" keyProperty="id">
-        insert into sys_role
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="roleName != null">role_name,</if>
-            <if test="roleCode != null">role_code,</if>
-            <if test="description != null">description,</if>
-            <if test="status != null">status,</if>
-            <if test="createTime != null">create_time,</if>
-            <if test="updateTime != null">update_time,</if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="roleName != null">#{roleName},</if>
-            <if test="roleCode != null">#{roleCode},</if>
-            <if test="description != null">#{description},</if>
-            <if test="status != null">#{status},</if>
-            <if test="createTime != null">#{createTime},</if>
-            <if test="updateTime != null">#{updateTime},</if>
-        </trim>
+    <insert id="addRole">
+        insert into sys_role(role_name, role_code, description, create_time, update_time)
+        values(#{roleName}, #{roleCode}, #{description},  NOW(), NOW())
     </insert>
-
-    <!-- 修改角色 -->
-    <update id="update" parameterType="com.sme.entity.Role">
+    <update id="updateRole">
         update sys_role
-        <set>
-            <if test="roleName != null and roleName != ''">role_name = #{roleName},</if>
-            <if test="roleCode != null and roleCode != ''">role_code = #{roleCode},</if>
-            <if test="description != null">description = #{description},</if>
-            <if test="status != null">status = #{status},</if>
-            <if test="updateTime != null">update_time = #{updateTime},</if>
-        </set>
+        set role_name = #{roleName}, role_code = #{roleCode}, description = #{description}, update_time = NOW()
         where id = #{id}
     </update>
-
-    <!-- 删除角色 -->
-    <delete id="delete" parameterType="long">
+    <delete id="deleteRole">
         delete from sys_role where id = #{id}
     </delete>
-
-    <!-- 新增角色-权限关联 -->
-    <insert id="insertRolePermission">
-        insert into role_permission(role_id, permission_id) values(#{roleId}, #{permissionId})
-    </insert>
-
-    <!-- 删除角色-权限关联 -->
-    <delete id="deleteRolePermission" parameterType="long">
-        delete from role_permission where role_id = #{roleId}
-    </delete>
-
-    <!-- 根据角色ID查询权限ID列表 -->
-    <select id="findPermissionIdsByRoleId" parameterType="long" resultType="long">
-        select permission_id from role_permission where role_id = #{roleId}
-    </select>
 
     <!-- 分页查询角色） -->
     <select id="pageQuery" resultMap="RoleResultMap">
         select * from sys_role
-        where status = 1
         <if test="roleName != null and roleName != ''">
             AND role_name LIKE CONCAT('%', #{roleName}, '%')
         </if>
@@ -97,6 +36,21 @@
         <if test="userId != null">
             AND id IN (SELECT role_id FROM user_role WHERE user_id = #{userId})
         </if>
+    </select>
+
+    <select id="selectAllRoles" resultType="com.sme.entity.Role">
+        SELECT * FROM sys_role WHERE del_flag = 0 ORDER BY id ASC
+    </select>
+    <select id="checkRoleCodeUnique" resultType="int">
+        SELECT COUNT(1)
+        FROM sys_role
+        WHERE role_code = #{roleCode}
+        <if test="id != null">
+            AND id != #{id}
+        </if>
+    </select>
+    <select id="getRoleById" resultType="com.sme.entity.Role">
+        select * from sys_role where id = #{id}
     </select>
 
 </mapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sme.mapper.RolePermissionMapper">
+
+    <!-- 批量保存角色-权限关联（适配role_permission表） -->
+    <insert id="batchSave">
+        INSERT INTO role_permission (role_id, permission_id, create_time)
+        VALUES
+        <foreach collection="permissionIds" item="permissionId" separator=",">
+            (#{roleId}, #{permissionId}, CURRENT_TIMESTAMP)
+        </foreach>
+    </insert>
+
+    <!-- 物理删除角色所有已分配权限（无del_flag，直接删除） -->
+    <delete id="deleteByRoleId">
+        DELETE FROM role_permission WHERE role_id = #{roleId}
+    </delete>
+
+    <!-- 查询角色已分配的菜单ID列表 -->
+    <select id="selectPermissionIdsByRoleId" resultType="java.lang.Long">
+        SELECT permission_id FROM role_permission WHERE role_id = #{roleId}
+    </select>
+
+    <!-- 查询角色可访问的菜单列表（关联sys_permission） -->
+    <select id="selectPermissionsByRoleId" resultType="com.sme.entity.SysPermission">
+        SELECT p.*
+        FROM sys_permission p
+                 INNER JOIN role_permission rp ON p.id = rp.permission_id
+        WHERE rp.role_id = #{roleId}
+          AND p.del_flag = 0  -- 关联未删除的菜单
+        ORDER BY p.sort ASC
+    </select>
+</mapper>
