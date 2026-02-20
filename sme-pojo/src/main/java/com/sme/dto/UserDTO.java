@@ -66,4 +66,7 @@ public class UserDTO implements Serializable {
      * 逻辑删除：0-未删 / 1-已删
      */
     private Byte delFlag = 0;
+
+    private String roleCode;
+
 }

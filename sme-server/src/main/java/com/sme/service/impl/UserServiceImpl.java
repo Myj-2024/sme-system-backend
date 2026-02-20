@@ -1,14 +1,14 @@
 package com.sme.service.impl;
-
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sme.constant.MessageConstant;
 import com.sme.dto.UserLoginDTO;
 import com.sme.dto.UserPageQueryDTO;
+import com.sme.entity.Role;
 import com.sme.entity.User;
 import com.sme.exception.BaseException;
 import com.sme.mapper.RoleMapper;
 import com.sme.mapper.UserMapper;
-import com.sme.mapper.UserRoleMapper;
 import com.sme.result.PageResult;
 import com.sme.service.UserService;
 import com.sme.utils.JwtUtil;
@@ -18,14 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-
 /**
  * 用户服务实现
- *
  */
 @Slf4j
 @Service
@@ -39,9 +36,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private UserRoleMapper userRoleMapper;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -61,15 +55,9 @@ public class UserServiceImpl implements UserService {
         return userMapper.findByUserName(username);
     }
 
-    /**
-     *新增 用户
-     * @param user
-     * @return
-     */
     @Override
     public Boolean insert(User user) {
         try {
-            // 修复：统一使用Spring的PasswordEncoder加密密码，移除冗余的PasswordEncoderUtil
             if (user.getPassword() != null && !user.getPassword().isEmpty()) {
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
                 log.info("用户{}密码加密完成", user.getUsername());
@@ -85,33 +73,25 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    /**
-     * 修改用户
-     * @param user
-     * @return
-     */
     @Override
     public Boolean update(User user) {
         try {
-            // 如果更新密码，重新加密
             if (user.getPassword() != null && !user.getPassword().isEmpty()) {
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
                 log.info("用户{}密码更新并加密完成", user.getUsername());
             }
-            boolean result = userMapper.update(user);
+            int result = userMapper.update(user);
             log.info("更新用户{}成功，ID：{}", user.getUsername(), user.getId());
-            return result;
+            if (result > 0){
+                return(true);
+            }
         } catch (Exception e) {
             log.error("更新用户失败：{}", e.getMessage(), e);
             throw new BaseException("更新用户失败：" + e.getMessage());
         }
+        return false;
     }
 
-    /**
-     * 删除用户
-     * @param id
-     * @return
-     */
     @Override
     public Boolean deleteById(Long id) {
         try {
@@ -128,38 +108,13 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    /**
-     * 获取用户信息（包含角色信息）
-     *
-     * @param userId
-     * @return
-     */
-    @Override
-    public User findUserWithRoleById(Long userId) {
-        User user = userMapper.findById(userId);
-//        if (user != null){
-//            user.setRoles(roleMapper.findRolesByUserId(userId));
-//        }
-        return user;
-    }
-
-    /**
-     * 修改用户状态
-     *
-     * @param status
-     * @param id
-     */
     @Override
     public void updateUserStatus(Integer status, Long id) {
-        // 1. 获取当前登录用户的ID
         Long currentUserId = UserContext.getUserId();
-
-        // 2. 校验：禁止操作自己的状态
         if (currentUserId != null && currentUserId.equals(id)) {
             throw new BaseException("不允许修改当前登录用户自身的状态！");
         }
 
-        // 3. 原有逻辑
         User user = User.builder()
                 .status(status)
                 .id(id)
@@ -167,27 +122,64 @@ public class UserServiceImpl implements UserService {
         userMapper.update(user);
     }
 
-
-    /**
-     * 分页查询用户
-     * @param userPageQueryDTO
-     * @return
-     */
     @Override
     public PageResult pageQuery(UserPageQueryDTO userPageQueryDTO) {
-
         PageHelper.startPage(userPageQueryDTO.getPageNum(), userPageQueryDTO.getPageSize());
-
         Page<User> page = userMapper.pageQuery(userPageQueryDTO);
-
         return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    @Override
+    public boolean updateRole(User user) {
+        Role role = roleMapper.getRoleById(user.getRoleId());
+        if (role == null || role.getDelFlag() == 1) {
+            throw new BaseException("角色不存在或已被删除");
+        }
+        return userMapper.updateRoleById(user) > 0;
+    }
+
+    /**
+     * 重置密码（修复后）
+     * @param id
+     */
+    @Override
+    public void resetPassword(Long id) {
+        // 1. 参数校验
+        if (id == null || id <= 0) {
+            throw new BaseException(MessageConstant.PARAMETER_ERROR); // 改用自定义业务异常
+        }
+
+        // 2. 校验用户是否存在
+        User user = userMapper.findById(id);
+        if (user == null) {
+            throw new BaseException(MessageConstant.USER_NOT_FOUND); // 改用自定义业务异常
+        }
+
+        // 3. 重置密码为123456（复用Spring容器中的passwordEncoder）
+        String defaultPassword = "123456";
+        String encodedPassword = passwordEncoder.encode(defaultPassword);
+
+        // 4. 构建更新实体
+        User updateUser = new User();
+        updateUser.setId(id);
+        updateUser.setPassword(encodedPassword);
+
+        // 5. 执行更新（正确接收int类型的受影响行数）
+        int affectedRows = userMapper.update(updateUser);
+
+        // 6. 校验更新结果（成功不抛异常，失败抛自定义异常）
+        if (affectedRows <= 0) {
+            throw new BaseException(MessageConstant.USER_PASSWORD_RESET_FAILED);
+        }
+
+        // 7. 成功仅打印日志，不抛异常
+        log.info("用户ID:{} 密码重置成功，默认密码：123456", id);
     }
 
     @Override
     public UserLoginVO login(UserLoginDTO userLoginDTO) {
         log.info("用户登录请求：{}", userLoginDTO.getUsername());
 
-        // 1. 参数校验
         if (userLoginDTO.getUsername() == null || userLoginDTO.getUsername().isEmpty()) {
             throw new BaseException("用户名不能为空");
         }
@@ -195,31 +187,26 @@ public class UserServiceImpl implements UserService {
             throw new BaseException("密码不能为空");
         }
 
-        // 2. 查询用户
         User user = userMapper.findByUserName(userLoginDTO.getUsername());
         if (user == null) {
             log.warn("用户{}不存在，登录失败", userLoginDTO.getUsername());
             throw new BaseException("用户不存在");
         }
 
-        // 3. 验证密码（使用Spring的PasswordEncoder）
         if (!passwordEncoder.matches(userLoginDTO.getPassword(), user.getPassword())) {
             log.warn("用户{}密码错误，登录失败", userLoginDTO.getUsername());
             throw new BaseException("密码错误");
         }
 
-        // 4. 检查用户状态
         if (user.getStatus() == 0) {
             log.warn("用户{}已被禁用，登录失败", userLoginDTO.getUsername());
             throw new BaseException("用户已被禁用");
         }
 
         try {
-            // 5. 生成JWT令牌（修复：使用实例化的jwtUtil，不再静态调用）
             String token = jwtUtil.generateToken(user.getId(), user.getUsername());
             log.info("用户{}Token生成成功", user.getUsername());
 
-            // 6. 封装返回结果
             UserLoginVO userLoginVO = new UserLoginVO();
             userLoginVO.setToken(token);
             userLoginVO.setId(user.getId());

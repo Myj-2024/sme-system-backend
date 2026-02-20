@@ -9,4 +9,11 @@ public class PermissionPageQueryDTO {
     private Integer pageSize;
     private String name;
     private String code;
+
+    /**
+     * 图标路径
+     */
+    private String iconUrl;
+
+    private Long iconId;
 }

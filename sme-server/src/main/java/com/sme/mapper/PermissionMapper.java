@@ -26,7 +26,7 @@ public interface PermissionMapper {
     int deletePermission(Long id);
 
 
-    int checkPathUnique(String path);
+    int checkPathUnique(@Param("path") String path, @Param("id") Long id);
 
     /**
      * 查询所有未删除的菜单权限（供管理员使用）

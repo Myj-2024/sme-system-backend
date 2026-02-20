@@ -3,6 +3,7 @@ package com.sme.controller;
 
 import com.sme.constant.MessageConstant;
 import com.sme.dto.UserPageQueryDTO;
+import com.sme.entity.Role;
 import com.sme.entity.User;
 import com.sme.exception.BaseException;
 import com.sme.result.PageResult;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -168,5 +170,46 @@ public class UserController {
         Map<String, Object> data = new HashMap<>();
         data.put("user", user);
         return Result.success(data);
+
     }
+
+    /**
+     * 修改用户角色
+     * @param id
+     * @param user
+     * @return
+     */
+    @PutMapping("/{id}/role")
+    public Result updateRole(@PathVariable Long id, @RequestBody User user) {
+        // 1. 基础参数校验
+        Assert.notNull(id, "用户ID不能为空");
+        Assert.notNull(user.getRoleId(), "角色ID不能为空");
+        Assert.isTrue(user.getRoleId() != 0, "角色ID不能为0");
+
+        // 2. 构建仅包含需要更新字段的用户对象，防止其他字段被篡改
+        User updateUser = new User();
+        updateUser.setId(id);
+        updateUser.setRoleId(user.getRoleId()); // 只更新角色ID
+
+        // 3. 执行更新操作
+        boolean result = userService.updateRole(updateUser);
+        if (result) {
+            return Result.success("角色分配成功");
+        }
+        return Result.error(MessageConstant.USER_UPDATE_ERROR);
+    }
+
+    /**
+     * 重置密码
+     * @param id
+     * @return
+     */
+    @PostMapping("/resetPwd/{id}")
+    public Result resetPassword(@PathVariable Long id) {
+        log.info("重置密码：{}", id);
+        userService.resetPassword(id);
+        return Result.success(MessageConstant.USER_PASSWORD_RESET_SUCCESS);
+    }
+
+
 }

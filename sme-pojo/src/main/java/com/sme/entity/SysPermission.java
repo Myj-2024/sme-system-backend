@@ -16,9 +16,14 @@ public class SysPermission{
     private String code;
     private Integer type;
     private String path;
-    private String icon;
     private Integer sort;
     private Date createTime;
     private Date updateTime;
     private Integer delFlag;
+    /**
+     * 图标路径
+     */
+    private String iconUrl;
+
+    private Long iconId;
 }

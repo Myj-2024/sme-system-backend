@@ -12,12 +12,12 @@
         <result column="del_flag" property="delFlag" />
     </resultMap>
 
-<!--    新增图标-->
+    <!--    新增图标-->
     <insert id="add">
         INSERT INTO sys_icon(icon_name, icon_code, icon_url, create_time, update_time)
         VALUES(#{iconName}, #{iconCode}, #{iconUrl},  NOW(), NOW())
     </insert>
-<!--    修改图标-->
+    <!--    修改图标-->
     <update id="update">
         UPDATE sys_icon
         <set>
@@ -36,7 +36,7 @@
         </set>
         WHERE id = #{id}
     </update>
-<!--    删除图标-->
+    <!--    删除图标-->
     <delete id="delete">
         DELETE FROM sys_icon
         WHERE id = #{id}
@@ -54,11 +54,11 @@
         </if>
         ORDER BY id
     </select>
-<!--        根据ID查询-->
+    <!--        根据ID查询-->
     <select id="getById" resultMap="iconResultMap">
-            select * from sys_icon where id=#{id}
+        select * from sys_icon where id=#{id}
     </select>
-<!--    编码唯一性校验-->
+    <!--    编码唯一性校验-->
     <select id="checkIconCodeUnique" resultType="java.lang.Integer">
         select count(1) from sys_icon
         where icon_code=#{iconCode} and del_flag=0

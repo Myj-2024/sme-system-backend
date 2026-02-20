@@ -80,4 +80,11 @@ public class User implements Serializable {
 
     private List<Role> roles;
 
+    /**
+     * 角色名称
+     */
+    private String roleName;
+
+    private String roleCode;
+
 }

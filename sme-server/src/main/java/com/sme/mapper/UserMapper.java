@@ -33,7 +33,7 @@ public interface UserMapper{
     /**
      * 修改用户
      */
-    Boolean update(User user);
+    int update(User user);
 
     /**
      * 删除用户
@@ -49,4 +49,9 @@ public interface UserMapper{
      * 查询所有有效用户ID（未删除）
      */
     List<Long> listAllValidUserId();
+
+    /**
+     * 修改用户角色
+     */
+    int updateRoleById(User user);
 }

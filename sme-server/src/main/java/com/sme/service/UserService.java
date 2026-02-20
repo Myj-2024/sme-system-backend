@@ -3,8 +3,10 @@ package com.sme.service;
 import com.github.pagehelper.Page;
 import com.sme.dto.UserLoginDTO;
 import com.sme.dto.UserPageQueryDTO;
+import com.sme.entity.Role;
 import com.sme.entity.User;
 import com.sme.result.PageResult;
+import com.sme.result.Result;
 import com.sme.vo.UserLoginVO;
 
 import java.util.List;
@@ -47,10 +49,6 @@ public interface UserService {
      */
     Boolean deleteById(Long id);
 
-    /**
-     * 根据用户ID查询用户信息（包含角色信息）
-     */
-    User findUserWithRoleById(Long userId);
 
     /**
      * 修改用户状态
@@ -63,4 +61,15 @@ public interface UserService {
      * 分页查询用户列表
      */
     PageResult pageQuery(UserPageQueryDTO userPageQueryDTO);
+
+
+    /**
+     * 修改用户角色
+     */
+    boolean updateRole(User updateUser);
+
+    /**
+     * 重置密码
+     */
+    void resetPassword(Long id);
 }

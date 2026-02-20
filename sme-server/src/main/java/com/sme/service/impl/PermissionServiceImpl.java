@@ -38,8 +38,8 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public Result<SysPermission> addPermission(SysPermission permission) {
-
-        if (permissionMapper.checkPathUnique(permission.getPath()) > 0) {
+        // 新增时：只校验路径，不传入ID（SQL中不会执行id != ?）
+        if (permissionMapper.checkPathUnique(permission.getPath(), null) > 0) {
             // 返回明确的错误提示，方便前端展示
             return Result.error("权限路径【" + permission.getPath() + "】已存在，请勿重复添加！");
         }
@@ -50,12 +50,13 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public Result<SysPermission> updatePermission(SysPermission permission) {
-        if (permissionMapper.checkPathUnique(permission.getPath()) > 0) {
+        // 编辑时：传入当前权限ID，让SQL排除自身
+        if (permissionMapper.checkPathUnique(permission.getPath(), permission.getId()) > 0) {
             // 返回明确的错误提示，方便前端展示
-            return Result.error("权限路径【" + permission.getPath() + "】已存在，请勿重复添加！");
+            return Result.error("权限路径【" + permission.getPath() + "】已存在，请勿重复修改！");
         }
         permissionMapper.updatePermission(permission);
-        return Result.success(permission);
+        return Result.success("更新成功");
     }
 
     @Override

@@ -57,4 +57,17 @@ public class UserPageQueryDTO implements Serializable {
      * 创建时间
      */
     private Date createTime;
+
+    /**
+     * 角色名称
+     */
+    private String roleName;
+
+    /**
+     * 角色ID（关联角色表，可扩展sys_role）
+     */
+    private Long roleId = 0L;
+
+    private String roleCode;
+
 }

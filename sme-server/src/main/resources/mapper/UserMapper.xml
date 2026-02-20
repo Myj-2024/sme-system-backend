@@ -2,145 +2,171 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sme.mapper.UserMapper">
 
-    <!-- 基础结果映射（适配dept_code + 关联字典项获取部门名称） -->
+    <!-- 基础结果映射（包含部门、角色关联字段，新增roleCode映射） -->
     <resultMap id="UserResultMap" type="com.sme.entity.User">
         <id column="id" property="id" />
         <result column="username" property="username" />
         <result column="password" property="password" />
         <result column="real_name" property="realName" />
         <result column="phone" property="phone" />
-        <result column="dept_code" property="deptCode" />  <!-- 替换dept_id为dept_code -->
-        <result column="dept_name" property="deptName" />  <!-- 部门名称（从字典项获取） -->
+        <result column="dept_code" property="deptCode" />
+        <result column="dept_name" property="deptName" />
+        <!-- 角色相关字段映射（新增roleCode） -->
+        <result column="role_id" property="roleId" />
+        <result column="role_name" property="roleName" />
+        <result column="role_code" property="roleCode" />
         <result column="status" property="status" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="del_flag" property="delFlag" />
     </resultMap>
 
-    <!-- 关联角色的结果映射（继承基础映射+角色列表） -->
-    <resultMap id="UserWithRolesResultMap" type="com.sme.entity.User" extends="UserResultMap">
-        <collection property="roles" ofType="com.sme.entity.Role">
-            <id column="r_id" property="id"/>
-            <result column="r_role_name" property="roleName"/>
-            <result column="r_role_code" property="roleCode"/>
-            <result column="r_description" property="description"/>
-            <result column="r_status" property="status"/>
-        </collection>
-    </resultMap>
-
-    <!-- 查询用户列表（关联字典项获取部门名称，dict_id=10为部门类型字典） -->
-    <select id="findAll" resultMap="UserWithRolesResultMap">
+    <!-- 查询用户列表（关联部门字典+角色表，新增role_code字段查询） -->
+    <select id="findAll" resultMap="UserResultMap">
         SELECT
         u.id, u.username, u.password, u.real_name, u.phone, u.dept_code,
-        di.item_name as dept_name,  <!-- 从字典项获取部门名称 -->
-        u.status, u.create_time, u.update_time, u.del_flag,
-        r.id as r_id, r.role_name as r_role_name, r.role_code as r_role_code,
-        r.description as r_description, r.status as r_status
+        di.item_name as dept_name,
+        u.role_id, r.role_name, r.role_code,
+        u.status, u.create_time, u.update_time, u.del_flag
         FROM sys_user u
         LEFT JOIN sys_dict_item di ON u.dept_code = di.item_code
-        AND di.dict_id = 10  <!-- 限定为部门类型字典（dict_id=10） -->
+        AND di.dict_id = 10
         AND di.del_flag = 0
-        AND di.status = 1    <!-- 只关联启用的部门字典项 -->
-        LEFT JOIN user_role ur ON u.id = ur.user_id
-        LEFT JOIN sys_role r ON ur.role_id = r.id
+        AND di.status = 1
+        <!-- 关联sys_role表获取角色名称和编码 -->
+        LEFT JOIN sys_role r ON u.role_id = r.id
+        AND r.del_flag = 0
         WHERE u.del_flag = 0
-        AND (r.del_flag = 0 OR r.del_flag IS NULL)
     </select>
 
-    <!-- 根据ID查询用户（关联字典项获取部门名称） -->
+    <!-- 根据ID查询用户（关联部门+角色，新增role_code字段） -->
     <select id="findById" parameterType="long" resultMap="UserResultMap">
-        select
-        u.id, u.username, u.password, u.real_name, u.phone, u.dept_code,
-        di.item_name as dept_name,  <!-- 从字典项获取部门名称 -->
-        u.status, u.create_time, u.update_time, u.del_flag
-        from sys_user u
-        LEFT JOIN sys_dict_item di ON u.dept_code = di.item_code
-        AND di.dict_id = 10
-        AND di.del_flag = 0
-        AND di.status = 1
-        where u.id = #{id} and u.del_flag = 0
+        SELECT
+            u.id, u.username, u.password, u.real_name, u.phone, u.dept_code,
+            di.item_name as dept_name,
+            u.role_id, r.role_name, r.role_code,
+            u.status, u.create_time, u.update_time, u.del_flag
+        FROM sys_user u
+                 LEFT JOIN sys_dict_item di ON u.dept_code = di.item_code
+            AND di.dict_id = 10
+            AND di.del_flag = 0
+            AND di.status = 1
+                 LEFT JOIN sys_role r ON u.role_id = r.id
+            AND r.del_flag = 0
+        WHERE u.id = #{id} AND u.del_flag = 0
     </select>
 
-    <!-- 根据用户名查询用户（关联字典项获取部门名称）-->
+    <!-- 根据用户名查询用户（关联部门+角色，新增role_code字段）-->
     <select id="findByUserName" parameterType="string" resultMap="UserResultMap">
-        select
-        u.id, u.username, u.password, u.real_name, u.phone, u.dept_code,
-        di.item_name as dept_name,  <!-- 从字典项获取部门名称 -->
-        u.status, u.create_time, u.update_time, u.del_flag
-        from sys_user u
-        LEFT JOIN sys_dict_item di ON u.dept_code = di.item_code
-        AND di.dict_id = 10
-        AND di.del_flag = 0
-        AND di.status = 1
-        where u.username = #{username} and u.del_flag = 0
+        SELECT
+            u.id, u.username, u.password, u.real_name, u.phone, u.dept_code,
+            di.item_name as dept_name,
+            u.role_id, r.role_name, r.role_code,
+            u.status, u.create_time, u.update_time, u.del_flag
+        FROM sys_user u
+                 LEFT JOIN sys_dict_item di ON u.dept_code = di.item_code
+            AND di.dict_id = 10
+            AND di.del_flag = 0
+            AND di.status = 1
+                 LEFT JOIN sys_role r ON u.role_id = r.id
+            AND r.del_flag = 0
+        WHERE u.username = #{username} AND u.del_flag = 0
     </select>
 
-    <!-- 分页查询（适配dept_code + 关联字典项） -->
+    <!-- 分页查询（支持role_id/role_name/role_code查询和回显） -->
     <select id="pageQuery" resultMap="UserResultMap">
-        select
-        u.id, u.username, u.real_name, u.phone, u.dept_code, u.status,
-        di.item_name as dept_name, u.create_time
+        SELECT
+        u.id, u.username, u.real_name, u.phone, u.dept_code, u.role_id,
+        di.item_name as dept_name, r.role_name, r.role_code,
+        u.status, u.create_time
         FROM sys_user u
         LEFT JOIN sys_dict_item di ON u.dept_code = di.item_code
         AND di.dict_id = 10
         AND di.del_flag = 0
         AND di.status = 1
+        LEFT JOIN sys_role r ON u.role_id = r.id
+        AND r.del_flag = 0
         <where>
-            <!-- 1. 增加空字符串判断，避免like '%%' -->
+            u.del_flag = 0
             <if test="username != null and username != ''">
-                and u.username like concat('%', #{username}, '%')
+                AND u.username like concat('%', #{username}, '%')
             </if>
             <if test="realName != null and realName != ''">
-                and u.real_name like concat('%', #{realName}, '%')
+                AND u.real_name like concat('%', #{realName}, '%')
             </if>
             <if test="phone != null and phone != ''">
-                and u.phone like concat('%', #{phone}, '%')
+                AND u.phone like concat('%', #{phone}, '%')
             </if>
             <if test="status != null">
-                and u.status = #{status}
+                AND u.status = #{status}
             </if>
-            <!-- 替换deptId查询为deptCode查询 -->
             <if test="deptCode != null and deptCode != ''">
-                and u.dept_code = #{deptCode}
+                AND u.dept_code = #{deptCode}
             </if>
-            <!-- 可选：支持按部门名称模糊查询（从字典项匹配） -->
             <if test="deptName != null and deptName != ''">
-                and di.item_name like concat('%', #{deptName}, '%')
+                AND di.item_name like concat('%', #{deptName}, '%')
+            </if>
+            <!-- 角色ID查询 -->
+            <if test="roleId != null and roleId != 0">
+                AND u.role_id = #{roleId}
+            </if>
+            <!-- 角色名称模糊查询 -->
+            <if test="roleName != null and roleName != ''">
+                AND r.role_name like concat('%', #{roleName}, '%')
+            </if>
+            <!-- 新增：角色编码模糊查询 -->
+            <if test="roleCode != null and roleCode != ''">
+                AND r.role_code like concat('%', #{roleCode}, '%')
             </if>
         </where>
     </select>
 
-    <!-- 新增用户（适配dept_code字段） -->
+    <!-- 新增用户（新增role_id字段） -->
     <insert id="insert" parameterType="com.sme.entity.User" useGeneratedKeys="true" keyProperty="id">
-        insert into sys_user(
-            username, password, real_name, phone, dept_code, status
-        ) values(
-                    #{username}, #{password}, #{realName}, #{phone}, #{deptCode}, #{status}
+        INSERT INTO sys_user(
+            username, password, real_name, phone, dept_code, role_id, status
+        ) VALUES(
+                    #{username}, #{password}, #{realName}, #{phone}, #{deptCode}, #{roleId}, #{status}
                 )
     </insert>
 
-    <!-- 修改用户（适配dept_code字段） -->
+    <!-- 修改用户（新增role_id字段，补充updateTime自动赋值） -->
     <update id="update" parameterType="com.sme.entity.User">
-        update sys_user
+        UPDATE sys_user
         <set>
             <if test="username != null">username = #{username},</if>
             <if test="password != null">password = #{password},</if>
             <if test="realName != null">real_name = #{realName},</if>
             <if test="phone != null">phone = #{phone},</if>
             <if test="deptCode != null">dept_code = #{deptCode},</if>
+            <!-- 角色ID修改 -->
+            <if test="roleId != null">role_id = #{roleId},</if>
             <if test="status != null">status = #{status},</if>
-            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <!-- 自动更新时间，无需传参 -->
+            update_time = CURRENT_TIMESTAMP
         </set>
-        where id = #{id} and del_flag = 0
+        WHERE id = #{id} AND del_flag = 0
     </update>
 
-    <!-- 物理删除用户（直接删除数据库记录） -->
-    <delete id="deleteById" parameterType="long">
-        DELETE FROM gh_sme_service.sys_user WHERE id = #{id}
-    </delete>
+    <!-- 逻辑删除用户（替换物理删除，符合规范） -->
+    <update id="deleteById" parameterType="long">
+        UPDATE sys_user
+        SET del_flag = 1, update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
 
-    <!-- 查询所有有效用户ID（del_flag=0 保留原有逻辑，无需修改） -->
+    <!-- 查询所有有效用户ID -->
     <select id="listAllValidUserId" resultType="java.lang.Long">
-        SELECT id FROM gh_sme_service.sys_user WHERE del_flag = 0
+        SELECT id FROM sys_user WHERE del_flag = 0
     </select>
+
+    <!-- 新增：仅更新用户角色ID -->
+    <update id="updateRoleById" parameterType="com.sme.entity.User">
+        UPDATE sys_user
+        SET role_id = #{roleId},
+            update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+          AND del_flag = 0
+    </update>
+
 </mapper>

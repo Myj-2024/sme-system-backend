@@ -18,4 +18,6 @@ public class MessageConstant {
     public static final String DICT_STATUS_ERROR = "字典状态只能是0（禁用）或1（启用）";
     public static final String DICT_UPDATE_ERROR = "字典修改失败";
     public static final String UPLOAD_FAILED = "上传失败";
+    public static final String USER_PASSWORD_RESET_SUCCESS = "重置密码成功";
+    public static final String USER_PASSWORD_RESET_FAILED = "重置密码失败";
 }

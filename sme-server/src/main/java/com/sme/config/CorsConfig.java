@@ -25,7 +25,7 @@ public class CorsConfig {
 
         //允许所有源进行跨域请求
         config.addAllowedOriginPattern("http://localhost:3000");
-
+        config.addAllowedOriginPattern("http://192.168.5.65:3000");
         //允许所有请求方法进行跨域请求
         config.addAllowedHeader("*");
 

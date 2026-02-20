@@ -12,9 +12,13 @@ public class PermissionDTO {
     private String code;
     private Integer type;
     private String path;
-    private String icon;
     private Integer sort;
     private String createTime;
     private String updateTime;
     private Integer delFlag;
+
+    /**
+     * 图标路径
+     */
+    private String iconUrl;
 }
