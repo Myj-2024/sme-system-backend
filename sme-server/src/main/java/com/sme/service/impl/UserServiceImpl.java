@@ -357,6 +357,7 @@ public class UserServiceImpl implements UserService {
         componentMap.put("/notice/index", "@/views/notice/index.vue");
         componentMap.put("/notice/form", "@/views/notice/form.vue");
         componentMap.put("/notice/my", "@/views/notice/my.vue");
+        componentMap.put("/system/icon", "@/views/system/icon.vue");
 
         // 父菜单返回Layout，子菜单返回具体组件，未匹配的默认Layout
         return componentMap.getOrDefault(path, "Layout");

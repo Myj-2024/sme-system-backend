@@ -176,6 +176,8 @@ public class PermissionServiceImpl implements PermissionService {
         componentMap.put("/notice/index", "@/views/notice/index.vue");
         componentMap.put("/notice/form", "@/views/notice/form.vue");
         componentMap.put("/notice/my", "@/views/notice/my.vue");
+        componentMap.put("/system/icon", "@/views/system/icon.vue");
+
 
         return componentMap.getOrDefault(path, "Layout");
     }
