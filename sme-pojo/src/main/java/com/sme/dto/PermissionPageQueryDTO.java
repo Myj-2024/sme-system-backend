@@ -16,4 +16,8 @@ public class PermissionPageQueryDTO {
     private String iconUrl;
 
     private Long iconId;
+
+    private Long parentId;
+
+    private Integer isRoute;
 }

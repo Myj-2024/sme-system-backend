@@ -20,4 +20,6 @@ public class MessageConstant {
     public static final String UPLOAD_FAILED = "上传失败";
     public static final String USER_PASSWORD_RESET_SUCCESS = "重置密码成功";
     public static final String USER_PASSWORD_RESET_FAILED = "重置密码失败";
+    public static final String PERMISSION_QUERY_ERROR = "菜单权限查询失败";
+
 }

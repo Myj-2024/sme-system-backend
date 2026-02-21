@@ -7,6 +7,7 @@ import com.sme.entity.Role;
 import com.sme.entity.User;
 import com.sme.result.PageResult;
 import com.sme.result.Result;
+import com.sme.vo.PermissionVO;
 import com.sme.vo.UserLoginVO;
 
 import java.util.List;
@@ -82,4 +83,9 @@ public interface UserService {
      * 修改用户信息
      */
     Boolean updateProfile(User user);
+
+    /**
+     * 根据用户ID获取可访问的菜单列表（树形结构）
+     */
+    List<PermissionVO> getCurrentUserMenu(Long userId);
 }

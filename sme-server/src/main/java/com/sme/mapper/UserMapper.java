@@ -2,8 +2,10 @@ package com.sme.mapper;
 
 import com.github.pagehelper.Page;
 import com.sme.dto.UserPageQueryDTO;
+import com.sme.entity.SysPermission;
 import com.sme.entity.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -64,4 +66,7 @@ public interface UserMapper{
      * 修改用户信息
      */
     int updateProfile(User user);
+
+
 }
+

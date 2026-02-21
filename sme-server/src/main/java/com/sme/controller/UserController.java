@@ -11,6 +11,7 @@ import com.sme.result.Result;
 import com.sme.result.ResultCode;
 import com.sme.service.UserService;
 import com.sme.utils.UserContext;
+import com.sme.vo.PermissionVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -245,5 +246,23 @@ public class UserController {
         return Result.error("个人资料修改失败");
     }
 
+    @GetMapping("/menu")
+    @Operation(summary = "获取当前用户菜单", description = "根据用户角色返回可访问的菜单列表（树形结构）")
+    public Result<List<PermissionVO>> getCurrentUserMenu() {
+        try {
+            // 1. 获取当前登录用户ID
+            Long userId = UserContext.getUserId();
+            if (userId == null) {
+                return Result.error(ResultCode.USER_NOT_EXIST);
+            }
+
+            // 2. 调用Service获取菜单
+            List<PermissionVO> menuList = userService.getCurrentUserMenu(userId);
+            return Result.success(menuList);
+        } catch (Exception e) {
+            log.error("获取当前用户菜单失败", e);
+            return Result.error("获取菜单权限失败，请联系管理员");
+        }
+    }
 
 }

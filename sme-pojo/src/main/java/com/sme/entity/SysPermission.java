@@ -26,4 +26,9 @@ public class SysPermission{
     private String iconUrl;
 
     private Long iconId;
+
+
+   private String iconCode;
+   private Long parentId;
+    private Integer isRoute;
 }

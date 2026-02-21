@@ -21,4 +21,8 @@ public class PermissionDTO {
      * 图标路径
      */
     private String iconUrl;
+
+    private Long parentId;
+
+    private Integer isRoute;
 }

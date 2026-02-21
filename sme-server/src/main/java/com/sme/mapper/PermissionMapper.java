@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 权限Mapper
@@ -32,4 +33,9 @@ public interface PermissionMapper {
      * 查询所有未删除的菜单权限（供管理员使用）
      */
     List<SysPermission> selectAllPermissions();
+
+    /**
+     * 根据角色ID查询可访问的菜单（统一返回List<SysPermission>）
+     */
+    List<SysPermission> selectMenuByRoleId(@Param("roleId") Long roleId);
 }
