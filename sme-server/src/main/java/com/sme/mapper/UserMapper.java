@@ -54,4 +54,14 @@ public interface UserMapper{
      * 修改用户角色
      */
     int updateRoleById(User user);
+
+    /**
+     * 修改用户密码
+     */
+    int updatePassword(User user);
+
+    /**
+     * 修改用户信息
+     */
+    int updateProfile(User user);
 }

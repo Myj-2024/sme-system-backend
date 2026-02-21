@@ -10,6 +10,7 @@ import com.sme.exception.BaseException;
 import com.sme.mapper.RoleMapper;
 import com.sme.mapper.UserMapper;
 import com.sme.result.PageResult;
+import com.sme.result.Result;
 import com.sme.service.UserService;
 import com.sme.utils.JwtUtil;
 import com.sme.utils.UserContext;
@@ -174,6 +175,32 @@ public class UserServiceImpl implements UserService {
 
         // 7. 成功仅打印日志，不抛异常
         log.info("用户ID:{} 密码重置成功，默认密码：123456", id);
+    }
+
+    @Override
+    public Boolean updatePassword(User user) {
+        try {
+            // 只加密密码，不处理其他字段
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            int result = userMapper.updatePassword(user);
+            log.info("更新用户{}密码成功，ID：{}", user.getId(), user.getId());
+            return result > 0;
+        } catch (Exception e) {
+            log.error("更新用户密码失败：{}", e.getMessage(), e);
+            throw new BaseException("更新用户密码失败：" + e.getMessage());
+        }
+    }
+
+    @Override
+    public Boolean updateProfile(User user) {
+        try {
+            int result = userMapper.updateProfile(user);
+            log.info("更新用户{}个人资料成功，ID：{}", user.getId(), user.getId());
+            return result > 0;
+        } catch (Exception e) {
+            log.error("更新用户个人资料失败：{}", e.getMessage(), e);
+            throw new BaseException("更新用户个人资料失败：" + e.getMessage());
+        }
     }
 
     @Override

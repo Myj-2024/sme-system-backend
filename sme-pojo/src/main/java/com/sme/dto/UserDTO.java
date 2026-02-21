@@ -39,13 +39,19 @@ public class UserDTO implements Serializable {
     private String phone = "";
 
     /**
+     * 头像
+     */
+    private String avatar;
+
+
+    /**
      * 所属部门编码
      */
     private String deptCode;
     /**
      * 角色ID（关联角色表，可扩展sys_role）
      */
-    private Long roleId = 0L;
+    private Long roleId;
 
     /**
      * 状态：0-禁用 / 1-启用

@@ -72,4 +72,14 @@ public interface UserService {
      * 重置密码
      */
     void resetPassword(Long id);
+
+    /**
+     * 修改密码
+     */
+    Boolean updatePassword(User user);
+
+    /**
+     * 修改用户信息
+     */
+    Boolean updateProfile(User user);
 }

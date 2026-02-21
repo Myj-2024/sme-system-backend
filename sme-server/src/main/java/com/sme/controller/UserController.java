@@ -211,5 +211,39 @@ public class UserController {
         return Result.success(MessageConstant.USER_PASSWORD_RESET_SUCCESS);
     }
 
+    @PutMapping("/{id}/password")
+    @Operation(summary = "修改用户密码", description = "仅更新密码字段")
+    public Result updateUserPassword(@PathVariable Long id, @RequestBody Map<String, String> passwordParam) {
+        String newPassword = passwordParam.get("password");
+        if (newPassword == null || newPassword.isEmpty()) {
+            return Result.error("新密码不能为空");
+        }
+        // 构建仅包含id和password的User对象
+        User user = new User();
+        user.setId(id);
+        user.setPassword(newPassword);
+        boolean result = userService.updatePassword(user);
+        if (result) {
+            return Result.success();
+        }
+        return Result.error(MessageConstant.USER_UPDATE_ERROR);
+    }
+
+    @PutMapping("/{id}/profile")
+    @Operation(summary = "修改个人资料", description = "仅更新姓名、手机号、头像")
+    public Result updateUserProfile(@PathVariable Long id, @RequestBody User profile) {
+        User user = new User();
+        user.setId(id);
+        user.setRealName(profile.getRealName());
+        user.setPhone(profile.getPhone());
+        user.setAvatar(profile.getAvatar());
+
+        boolean result = userService.updateProfile(user);
+        if (result) {
+            return Result.success();
+        }
+        return Result.error("个人资料修改失败");
+    }
+
 
 }
