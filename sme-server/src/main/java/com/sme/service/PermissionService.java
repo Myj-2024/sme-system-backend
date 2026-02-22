@@ -9,16 +9,25 @@ import com.sme.vo.PermissionVO;
 import java.util.List;
 
 public interface PermissionService {
-    // 修改：返回PageResult分页对象（对齐用户管理）
+
+    // 分页查询
     PageResult getPermissions(PermissionPageQueryDTO pageDTO);
 
+    // 根据ID查询
     SysPermission getPermissionById(Long id);
 
+    // 新增权限
     Result<SysPermission> addPermission(SysPermission permission);
 
+    // 更新权限
     Result<SysPermission> updatePermission(SysPermission permission);
 
+    // 删除权限
     Result<SysPermission> deletePermission(Long id);
 
+    // 根据角色ID查询菜单（树形结构）
     List<PermissionVO> getMenuByRoleId(Long roleId);
+
+    // 查询所有权限
+    List<SysPermission> selectAllPermissions();
 }

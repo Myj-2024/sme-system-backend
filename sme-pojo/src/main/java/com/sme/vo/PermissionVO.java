@@ -1,6 +1,7 @@
 package com.sme.vo;
 
 import lombok.Data;
+
 import java.util.List;
 
 /**
@@ -26,6 +27,12 @@ public class PermissionVO {
     // 前端路由meta配置
     private MetaVO meta;
 
+    // 新增路由配置字段
+    private String componentPath;
+    private String redirectPath;
+    private String activeMenu;
+    private String routeName;
+
     /**
      * 路由元信息
      */
@@ -33,6 +40,7 @@ public class PermissionVO {
     public static class MetaVO {
         private String title;    // 菜单标题
         private String icon;     // 图标（兼容Element Plus）
-        private String activeMenu; // 面包屑高亮路径
+        private String activeMenu; // 高亮菜单路径
+        private Boolean hidden; // 面包屑高亮路径
     }
 }

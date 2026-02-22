@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sme.mapper.PermissionMapper">
 
-    <!-- 基础结果映射（补充isRoute字段） -->
+    <!-- 基础结果映射（包含所有字段） -->
     <resultMap id="BasePermissionResultMap" type="com.sme.entity.SysPermission">
         <id column="id" property="id"/>
         <result column="name" property="name"/>
@@ -12,22 +12,24 @@
         <result column="icon_id" property="iconId"/>
         <result column="parent_id" property="parentId"/>
         <result column="sort" property="sort"/>
-        <result column="icon_code" property="iconCode"/>
-        <result column="icon_url" property="iconUrl"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
         <result column="del_flag" property="delFlag"/>
-        <result column="isRoute" property="isRoute"/> <!-- 新增：映射isRoute字段 -->
-    </resultMap>
-
-    <!-- 关联图标表的结果映射（继承BasePermissionResultMap，自动包含isRoute） -->
-    <resultMap id="PermissionResultMap" type="com.sme.entity.SysPermission" extends="BasePermissionResultMap">
+        <result column="isRoute" property="isRoute"/>
+        <!-- 新增路由配置字段映射 -->
+        <result column="component_path" property="componentPath"/>
+        <result column="redirect_path" property="redirectPath"/>
+        <result column="active_menu" property="activeMenu"/>
+        <result column="route_name" property="routeName"/>
+        <result column="is_hidden" property="isHidden"/>
+        <!-- 关联图标字段 -->
+        <result column="icon_code" property="iconCode"/>
         <result column="icon_url" property="iconUrl"/>
     </resultMap>
 
-    <!-- 分页查询（不变） -->
-    <select id="getPermissions" resultMap="PermissionResultMap">
-        SELECT p.*, i.icon_url
+    <!-- 分页查询 -->
+    <select id="getPermissions" resultMap="BasePermissionResultMap">
+        SELECT p.*, i.icon_code, i.icon_url
         FROM sys_permission p
         LEFT JOIN sys_icon i ON p.icon_id = i.id AND i.del_flag = 0
         WHERE p.del_flag = 0
@@ -40,38 +42,51 @@
         ORDER BY p.parent_id ASC, p.sort ASC
     </select>
 
-    <!-- 根据id查询（不变） -->
-    <select id="getPermissionById" resultMap="PermissionResultMap">
-        SELECT p.*, i.icon_url
+    <!-- 根据ID查询 -->
+    <select id="getPermissionById" resultMap="BasePermissionResultMap">
+        SELECT p.*, i.icon_code, i.icon_url
         FROM sys_permission p
                  LEFT JOIN sys_icon i ON p.icon_id = i.id AND i.del_flag = 0
         WHERE p.id = #{id}
           AND p.del_flag = 0
     </select>
 
-    <!-- 新增：补充isRoute字段 -->
+    <!-- 新增权限（包含路由配置字段） -->
     <insert id="addPermission">
-        INSERT INTO sys_permission (name, code, type, path, icon_id, parent_id, sort, create_time, del_flag, isRoute)
-        VALUES (#{name}, #{code}, #{type}, #{path}, #{iconId}, #{parentId}, #{sort}, CURRENT_TIMESTAMP, 0, #{isRoute})
+        INSERT INTO sys_permission (
+            name, code, type, path, icon_id, parent_id, sort,
+            create_time, del_flag, isRoute, component_path,
+            redirect_path, active_menu, route_name, is_hidden
+        )
+        VALUES (
+                   #{name}, #{code}, #{type}, #{path}, #{iconId}, #{parentId}, #{sort},
+                   CURRENT_TIMESTAMP, 0, #{isRoute}, #{componentPath},
+                   #{redirectPath}, #{activeMenu}, #{routeName}, #{isHidden}
+               )
     </insert>
 
-    <!-- 更新：补充isRoute字段 -->
+    <!-- 更新权限（包含路由配置字段） -->
     <update id="updatePermission">
         UPDATE sys_permission
-        SET name        = #{name},
-        code        = #{code},
-        type        = #{type},
-        path        = #{path},
-        icon_id     = #{iconId},
-        parent_id   = #{parentId},
-        sort        = #{sort},
-        isRoute     = #{isRoute}, <!-- 新增：更新isRoute -->
-        update_time = CURRENT_TIMESTAMP
+        SET name          = #{name},
+            code          = #{code},
+            type          = #{type},
+            path          = #{path},
+            icon_id       = #{iconId},
+            parent_id     = #{parentId},
+            sort          = #{sort},
+            isRoute       = #{isRoute},
+            component_path = #{componentPath},
+            redirect_path = #{redirectPath},
+            active_menu   = #{activeMenu},
+            route_name    = #{routeName},
+            is_hidden     = #{isHidden},
+            update_time   = CURRENT_TIMESTAMP
         WHERE id = #{id}
-        AND del_flag = 0
+          AND del_flag = 0
     </update>
 
-    <!-- 删除（不变） -->
+    <!-- 删除权限（逻辑删除） -->
     <update id="deletePermission">
         UPDATE sys_permission
         SET del_flag    = 1,
@@ -79,7 +94,7 @@
         WHERE id = #{id}
     </update>
 
-    <!-- 路径唯一性校验（不变） -->
+    <!-- 路径唯一性校验 -->
     <select id="checkPathUnique" resultType="int">
         SELECT COUNT(1)
         FROM sys_permission
@@ -89,28 +104,34 @@
         </if>
     </select>
 
-    <!-- 查询所有权限（不变） -->
-    <select id="selectAllPermissions" resultMap="PermissionResultMap">
-        SELECT p.*, i.icon_url
+    <!-- 路由名称唯一性校验 -->
+    <select id="checkRouteNameUnique" resultType="int">
+        SELECT COUNT(1)
+        FROM sys_permission
+        WHERE route_name = #{routeName} AND del_flag = 0
+        <if test="id != null">
+            AND id != #{id}
+        </if>
+    </select>
+
+    <!-- 查询所有权限 -->
+    <select id="selectAllPermissions" resultMap="BasePermissionResultMap">
+        SELECT p.*, i.icon_code, i.icon_url
         FROM sys_permission p
                  LEFT JOIN sys_icon i ON p.icon_id = i.id AND i.del_flag = 0
         WHERE p.del_flag = 0
         ORDER BY p.parent_id ASC, p.sort ASC
     </select>
 
-    <!-- 根据角色ID查询菜单（补充isRoute字段查询） -->
+    <!-- 根据角色ID查询菜单 -->
     <select id="selectMenuByRoleId" resultMap="BasePermissionResultMap">
-        SELECT p.*,
-        i.icon_code,
-        i.icon_url,
-        p.isRoute <!-- 新增：查询isRoute字段 -->
+        SELECT p.*, i.icon_code, i.icon_url
         FROM sys_permission p
-        INNER JOIN role_permission rp ON p.id = rp.permission_id
-        LEFT JOIN sys_icon i ON p.icon_id = i.id
+                 INNER JOIN role_permission rp ON p.id = rp.permission_id
+                 LEFT JOIN sys_icon i ON p.icon_id = i.id
         WHERE rp.role_id = #{roleId}
-        AND p.type = 1
-        AND p.del_flag = 0
-        AND (i.del_flag = 0 OR i.del_flag IS NULL)
+          AND p.del_flag = 0
+          AND (i.del_flag = 0 OR i.del_flag IS NULL)
         ORDER BY p.parent_id ASC, p.sort ASC
     </select>
 

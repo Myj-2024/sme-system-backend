@@ -1,4 +1,5 @@
 package com.sme.service.impl;
+
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sme.constant.MessageConstant;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -94,8 +96,8 @@ public class UserServiceImpl implements UserService {
             }
             int result = userMapper.update(user);
             log.info("更新用户{}成功，ID：{}", user.getUsername(), user.getId());
-            if (result > 0){
-                return(true);
+            if (result > 0) {
+                return (true);
             }
         } catch (Exception e) {
             log.error("更新用户失败：{}", e.getMessage(), e);
@@ -261,7 +263,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 核心实现：用户→角色→权限→菜单的关联查询 + 树形结构构建
-     * 仅修改此处：整合isRoute字段过滤非路由节点
+     * 关键修改：移除硬编码组件映射，读取数据库配置的路由字段
      */
     @Override
     public List<PermissionVO> getCurrentUserMenu(Long userId) {
@@ -272,14 +274,14 @@ public class UserServiceImpl implements UserService {
             return new ArrayList<>();
         }
 
-        // 2. 根据role_id查询菜单（统一返回List<SysPermission>）
+        // 2. 根据role_id查询菜单（包含数据库配置的所有路由字段）
         List<SysPermission> permissionList = permissionMapper.selectMenuByRoleId(user.getRoleId());
         if (CollectionUtils.isEmpty(permissionList)) {
             log.warn("角色ID={} 无菜单权限", user.getRoleId());
             return new ArrayList<>();
         }
 
-        // ========== 核心新增：过滤isRoute=0的非路由节点 ==========
+        // 核心过滤：只保留可路由节点（isRoute=1）
         List<SysPermission> routePermissionList = permissionList.stream()
                 .filter(permission -> permission.getIsRoute() != null && permission.getIsRoute() == 1)
                 .collect(Collectors.toList());
@@ -288,87 +290,99 @@ public class UserServiceImpl implements UserService {
             return new ArrayList<>();
         }
 
-        // 3. 转换为VO对象（直接用SysPermission，无需Map）
+        // 3. 转换为VO对象（读取数据库配置的路由字段，移除硬编码）
         List<PermissionVO> permissionVOList = routePermissionList.stream().map(permission -> {
             PermissionVO vo = new PermissionVO();
             BeanUtils.copyProperties(permission, vo);
 
-            // ========== 新增：图标字段兜底（完整覆盖） ==========
+            // 图标字段兜底
             vo.setIconCode(Optional.ofNullable(permission.getIconCode()).orElse("Menu"));
-            vo.setIconUrl(Optional.ofNullable(permission.getIconUrl()).orElse("http://192.168.43.20:19966/my-project/default-menu.svg"));
+            vo.setIconUrl(Optional.ofNullable(permission.getIconUrl())
+                    .orElse("http://192.168.43.20:19966/my-project/default-menu.svg"));
 
-            // 适配前端路由字段
+            // 构建路由元信息（读取数据库配置）
             PermissionVO.MetaVO meta = new PermissionVO.MetaVO();
             meta.setTitle(permission.getName());
-            // 复用兜底后的iconCode
             meta.setIcon(vo.getIconCode());
 
-            // ========== 新增：补充activeMenu字段 ==========
-            if (permission.getId() == 12) { // 问题办理进度详情（已被过滤，仅兼容）
-                meta.setActiveMenu("/smePle/handle"); // 简化后路径
-            }else if (permission.getId() == 14) { // 通知详情（已被过滤）
+            // 优先读取数据库配置的activeMenu，无配置则兼容原有逻辑
+            if (StringUtils.hasText(permission.getActiveMenu())) {
+                meta.setActiveMenu(permission.getActiveMenu());
+            } else if (permission.getId() == 12) {
+                meta.setActiveMenu("/smePle/handle");
+            } else if (permission.getId() == 14) {
                 meta.setActiveMenu("/notice/index");
             } else {
                 meta.setActiveMenu(null);
             }
 
+            // 隐藏状态（读取数据库配置）
+            meta.setHidden(permission.getIsHidden() != null && permission.getIsHidden() == 1);
+
             vo.setMeta(meta);
-            // 补充isRoute字段到VO，方便前端二次校验
+
+            // 核心修改：读取数据库配置的组件路径，移除硬编码映射
+            vo.setComponentPath(Optional.ofNullable(permission.getComponentPath()).orElse("Layout"));
+
+            // 保留isRoute字段供前端校验
             vo.setIsRoute(permission.getIsRoute());
 
-            // 组件路径映射（核心修改：移除非路由节点的路径映射）
-            vo.setComponent(getComponentPath(permission.getPath()));
+            // 保留原有component字段（兼容前端过渡）
+            vo.setComponent(vo.getComponentPath());
 
             return vo;
         }).collect(Collectors.toList());
 
-        // 4. 构建树形结构
+        // 4. 构建树形结构（自动处理重定向和排序）
         return buildMenuTree(permissionVOList);
     }
 
     /**
-     * 路由path→前端组件路径映射
-     * 仅修改此处：移除非路由节点的路径映射
+     * 构建菜单树形结构（新增：支持重定向和排序）
      */
-    private String getComponentPath(String path) {
-        if (path == null || path.isEmpty()) return "Layout";
+    private List<PermissionVO> buildMenuTree(List<PermissionVO> menuList) {
+        // 1. 构建ID到菜单的映射
+        Map<Long, PermissionVO> menuMap = menuList.stream()
+                .collect(Collectors.toMap(PermissionVO::getId, menu -> menu));
 
-        Map<String, String> componentMap = new HashMap<>();
-        // 父菜单：统一返回Layout（前端布局组件）
-        componentMap.put("/system", "Layout");
-        componentMap.put("/enterprise", "Layout");
-        componentMap.put("/smePle", "Layout");
-        componentMap.put("/policy", "Layout");
-        componentMap.put("/notice", "Layout");
+        // 2. 组装父子关系
+        List<PermissionVO> rootMenus = new ArrayList<>();
+        for (PermissionVO menu : menuList) {
+            Long parentId = menu.getParentId();
+            if (parentId == null || parentId == 0) {
+                // 根菜单
+                rootMenus.add(menu);
+            } else {
+                // 子菜单
+                PermissionVO parentMenu = menuMap.get(parentId);
+                if (parentMenu != null) {
+                    if (parentMenu.getChildren() == null) {
+                        parentMenu.setChildren(new ArrayList<>());
+                    }
+                    parentMenu.getChildren().add(menu);
 
-        // 子菜单：精准匹配前端组件路径（移除非路由节点的路径）
-        componentMap.put("/dashboard", "@/views/dashboard/index.vue");
-        componentMap.put("/system/user", "@/views/system/user.vue");
-        componentMap.put("/system/role", "@/views/system/role.vue");
-        componentMap.put("/system/permission", "@/views/system/permission.vue");
-        componentMap.put("/system/dict", "@/views/system/dict.vue");
-        componentMap.put("/system/dict-data", "@/views/system/dict-data.vue");
-        componentMap.put("/enterprise/index", "@/views/enterprise/index.vue");
-        componentMap.put("/smePle/index", "@/views/smePle/index.vue");
-        componentMap.put("/smePle/dept-user", "@/views/smePle/dept-user.vue");
-        componentMap.put("/smePle/handle", "@/views/smePle/handle/index.vue"); // 简化后的path映射
-        componentMap.put("/smePle/handle/index", "@/views/smePle/handle/index.vue"); // 保留旧path，兼容过渡
-        componentMap.put("/policy/index", "@/views/policy/index.vue");
-        componentMap.put("/notice/index", "@/views/notice/index.vue");
-        componentMap.put("/notice/form", "@/views/notice/form.vue");
-        componentMap.put("/notice/my", "@/views/notice/my.vue");
-        componentMap.put("/system/icon", "@/views/system/icon.vue");
+                    // 父菜单默认重定向到第一个子菜单（无配置时）
+                    if (!StringUtils.hasText(parentMenu.getRedirectPath())
+                            && parentMenu.getChildren() != null
+                            && !parentMenu.getChildren().isEmpty()) {
+                        parentMenu.setRedirectPath(parentMenu.getChildren().get(0).getPath());
+                    }
+                }
+            }
+        }
 
-        // 父菜单返回Layout，子菜单返回具体组件，未匹配的默认Layout
-        return componentMap.getOrDefault(path, "Layout");
+        // 3. 按sort字段排序
+        rootMenus.forEach(this::sortChildren);
+        return rootMenus;
     }
 
     /**
-     * 扁平列表→树形结构
-     * 无修改
+     * 按sort字段排序子菜单
      */
-    private List<PermissionVO> buildMenuTree(List<PermissionVO> menuList) {
-        // 调用公共工具类（已适配parent_id树形构建）
-        return MenuTreeBuilder.buildTree(menuList);
+    private void sortChildren(PermissionVO menu) {
+        if (menu.getChildren() != null && !menu.getChildren().isEmpty()) {
+            menu.getChildren().sort(Comparator.comparingInt(PermissionVO::getSort));
+            menu.getChildren().forEach(this::sortChildren);
+        }
     }
 }
