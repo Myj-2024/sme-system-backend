@@ -155,4 +155,24 @@ public class SmeNoticeServiceImpl implements SmeNoticeService {
         Page<SmeNotice> page = smeNoticeMapper.queryMyNotice(userId);
         return new PageResult(page.getTotal(), page.getResult());
     }
+
+    /**
+     * 获取当前用户发送给别人的通知列表（我发送的通知）
+     * @param publisherId 发布人ID（当前登录用户ID）
+     * @param pageNum 页码
+     * @param pageSize 每页条数
+     * @param title 通知标题（模糊查询，可为null）
+     * @return 分页结果
+     */
+    @Override
+    public PageResult querySentNotice(Long publisherId, Integer pageNum, Integer pageSize, String title) {
+        // 1. 开启分页（PageHelper会自动拦截后续的MyBatis查询）
+        PageHelper.startPage(pageNum, pageSize);
+
+        // 2. 调用Mapper查询（传递发布人ID和标题筛选条件）
+        Page<SmeNotice> page = smeNoticeMapper.querySentNotice(publisherId, title);
+
+        // 3. 封装分页结果（和现有queryMyNotice保持一致的返回格式）
+        return new PageResult(page.getTotal(), page.getResult());
+    }
 }

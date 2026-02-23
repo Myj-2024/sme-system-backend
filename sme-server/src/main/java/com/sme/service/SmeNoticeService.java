@@ -47,4 +47,14 @@ public interface SmeNoticeService {
      * @return
      */
     PageResult queryMyNotice(Long userId, Integer pageNum, Integer pageSize);
+
+    /**
+     * 获取已发送通知列表
+     * @param publisherId
+     * @param pageNum
+     * @param pageSize
+     * @param title
+     * @return
+     */
+    PageResult querySentNotice(Long publisherId, Integer pageNum, Integer pageSize, String title);
 }

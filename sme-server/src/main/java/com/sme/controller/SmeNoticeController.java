@@ -8,6 +8,7 @@ import com.sme.result.Result;
 import com.sme.service.SmeNoticeService;
 import com.sme.utils.UserContext; // 新增：引入项目统一的用户上下文工具类
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,4 +97,28 @@ public class SmeNoticeController {
         return Result.success(page);
     }
 
+    /**
+     * 7. 获取当前用户发送给别人的通知列表（我发送的通知）
+     */
+    @GetMapping("/sent")
+    @Operation(summary = "获取当前用户发送给别人的通知列表")
+    public Result<PageResult> sentNotice(
+            @Parameter(description = "页码", required = true) @RequestParam Integer pageNum,
+            @Parameter(description = "每页条数", required = true) @RequestParam Integer pageSize,
+            @Parameter(description = "通知标题（模糊查询）") @RequestParam(required = false) String title
+    ) {
+        // 1. 获取当前登录用户ID
+        Long publisherId = UserContext.getUserId();
+        if (publisherId == null) {
+            log.warn("查询我发送的通知失败：用户未登录");
+            return Result.error("未登录");
+        }
+
+        // 2. 调用service查询我发送的通知
+        PageResult page = smeNoticeService.querySentNotice(publisherId, pageNum, pageSize, title);
+        log.info("查询当前用户{}发送的通知，页码{}，每页{}条，标题筛选{}，结果总数{}",
+                publisherId, pageNum, pageSize, title, page.getTotal());
+
+        return Result.success(page);
+    }
 }

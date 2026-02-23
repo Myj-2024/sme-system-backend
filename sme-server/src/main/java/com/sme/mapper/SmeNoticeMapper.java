@@ -5,6 +5,7 @@ import com.sme.dto.SmeNoticeDTO;
 import com.sme.dto.SmeNoticePageQueryDTO;
 import com.sme.entity.SmeNotice;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface SmeNoticeMapper {
@@ -30,7 +31,7 @@ public interface SmeNoticeMapper {
     int updateNotice(SmeNoticeDTO dto);
 
     /**
-     * 逻辑删除通知
+     * 删除通知
      */
     int deleteById(Long id);
 
@@ -38,4 +39,15 @@ public interface SmeNoticeMapper {
      * 查询当前用户的通知列表
      */
     Page<SmeNotice> queryMyNotice(Long userId);
+
+    /**
+     * 查询当前用户发送的通知列表
+     * @param publisherId 发布人ID
+     * @param title 通知标题（模糊查询，可为null）
+     * @return 分页结果（PageHelper自动封装）
+     */
+    Page<SmeNotice> querySentNotice(
+            @Param("publisherId") Long publisherId,
+            @Param("title") String title
+    );
 }
