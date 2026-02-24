@@ -17,13 +17,17 @@
         <result column="del_flag" property="delFlag" />
         <result column="policy_type_name" property="policyTypeName" />
         <result column="publisher_name" property="publisherName" />
+        <!-- 核心新增：映射发布人所属部门名称 -->
+        <result column="publisher_dept_name" property="publisherDeptName" />
     </resultMap>
-<!--    新增政策 -->
+
+    <!-- 新增政策 -->
     <insert id="insert" parameterType="com.sme.entity.Policy" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO gh_sme_service.sme_policy(title,policy_type,publisher_id,is_show,content,publish_time,is_top,create_time, update_time)
         VALUES (#{title},#{policyType},#{publisherId},#{isShow},#{content},#{publishTime},#{isTop}, NOW(),NOW())
     </insert>
-        <!--修改政策-->
+
+    <!--修改政策-->
     <update id="updatePolicy">
         update sme_policy
         <set>
@@ -40,9 +44,10 @@
         </set>
         where id = #{id}
     </update>
-<!--    删除政策-->
+
+    <!-- 删除政策 -->
     <delete id="deletePolicy">
-            delete from gh_sme_service.sme_policy where id = #{id}
+        delete from gh_sme_service.sme_policy where id = #{id}
     </delete>
 
     <!-- PageHelper 分页查询（无需手动分页，插件自动拼接 LIMIT） -->
@@ -60,7 +65,9 @@
         p.update_time,
         p.del_flag,
         di.item_name as policy_type_name,
-        u.real_name as publisher_name
+        u.real_name as publisher_name,
+        <!-- 核心新增：查询发布人所属部门名称 -->
+        dept.item_name as publisher_dept_name
         FROM gh_sme_service.sme_policy p
         LEFT JOIN gh_sme_service.sys_dict_item di
         ON p.policy_type = di.item_code
@@ -71,6 +78,12 @@
         ON p.publisher_id = u.id
         AND u.del_flag = 0
         AND u.status = 1
+        <!-- 核心修改：和通知Mapper一致，直接用dict_id=10，删除子查询 -->
+        LEFT JOIN gh_sme_service.sys_dict_item dept
+        ON u.dept_code = dept.item_code
+        AND dept.dict_id = 10
+        AND dept.del_flag = 0
+        AND dept.status = 1
         WHERE 1=1  <!-- 替换原有的p.del_flag=0 -->
         <!-- 新增动态条件：默认过滤已隐藏，传showHidden=true则显示所有 -->
         <if test="showHidden != null and showHidden == false">
@@ -95,9 +108,31 @@
         ORDER BY p.is_top DESC, p.publish_time DESC
     </select>
 
-<!--    根据id查询政策-->
+    <!-- 根据id查询政策 -->
     <select id="getPolicyById" resultMap="PolicyResultMap">
-        select * from gh_sme_service.sme_policy where id = #{id}
+        select
+        p.*,
+        di.item_name as policy_type_name,
+        u.real_name as publisher_name,
+        <!-- 核心新增：单条查询也补充部门名称 -->
+        dept.item_name as publisher_dept_name
+        from gh_sme_service.sme_policy p
+        LEFT JOIN gh_sme_service.sys_dict_item di
+        ON p.policy_type = di.item_code
+        AND di.dict_id = (SELECT id FROM gh_sme_service.sys_dict WHERE dict_code = 'policy_type' AND del_flag = 0)
+        AND di.del_flag = 0
+        AND di.status = 1
+        LEFT JOIN gh_sme_service.sys_user u
+        ON p.publisher_id = u.id
+        AND u.del_flag = 0
+        AND u.status = 1
+        <!-- 核心修改：和通知Mapper一致，直接用dict_id=10 -->
+        LEFT JOIN gh_sme_service.sys_dict_item dept
+        ON u.dept_code = dept.item_code
+        AND dept.dict_id = 10
+        AND dept.del_flag = 0
+        AND dept.status = 1
+        where p.id = #{id}
     </select>
 
     <!-- 修正批量显示的参数名：collection="list" 匹配List<Long>入参 -->

@@ -179,7 +179,7 @@ public class UserServiceImpl implements UserService {
         updateUser.setPassword(encodedPassword);
 
         // 5. 执行更新（正确接收int类型的受影响行数）
-        int affectedRows = userMapper.update(updateUser);
+        int affectedRows = userMapper.resetPassword(updateUser);
 
         // 6. 校验更新结果（成功不抛异常，失败抛自定义异常）
         if (affectedRows <= 0) {

@@ -76,4 +76,7 @@ public class Policy implements Serializable {
      * 发布人姓名（从sys_user.real_name获取）
      */
     private String publisherName;
+
+    // 新增：发布人所属部门名称
+    private String publisherDeptName;
 }

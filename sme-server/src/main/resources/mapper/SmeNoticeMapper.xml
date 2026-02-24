@@ -15,7 +15,9 @@
         <result column="update_time" property="updateTime" />
         <result column="del_flag" property="delFlag" />
         <result column="is_read" property="isRead" />
-        <result property="publisherName" column="publisher_name"/>
+        <result column="publisher_name" property="publisherName"/>
+        <!-- 新增：映射发布人部门名称 -->
+        <result column="publisher_dept_name" property="publisherDeptName"/>
     </resultMap>
 
     <!-- 新增通知主体 -->
@@ -39,7 +41,7 @@
     <delete id="deleteById">
         DELETE FROM gh_sme_service.sme_notice
         WHERE id = #{id}
-        AND del_flag = 0
+          AND del_flag = 0
     </delete>
 
     <!-- 分页查询通知 -->
@@ -50,6 +52,8 @@
         p.notice_type,
         p.publisher_id,
         gy.real_name AS publisher_name,
+        -- 新增：关联字典项表获取发布人部门名称
+        di.item_name AS publisher_dept_name,
         p.content,
         p.publish_time,
         p.target_type,
@@ -60,6 +64,9 @@
         FROM gh_sme_service.sme_notice p
         LEFT JOIN gh_sme_service.sys_user gy
         ON p.publisher_id = gy.id AND gy.del_flag = 0
+        -- 新增：关联字典项表（dict_id=10 是部门字典）
+        LEFT JOIN gh_sme_service.sys_dict_item di
+        ON gy.dept_code = di.item_code AND di.dict_id = 10 AND di.del_flag = 0 AND di.status = 1
         WHERE p.del_flag = 0
         <if test="title != null and title != ''">
             AND p.title LIKE CONCAT('%', #{title}, '%')
@@ -82,9 +89,13 @@
                n.publish_time, n.target_type, n.target_value,
                n.create_time, n.update_time,
                n.del_flag,
-               u.real_name AS publisher_name
+               u.real_name AS publisher_name,
+               -- 新增：关联字典项表获取发布人部门名称
+               di.item_name AS publisher_dept_name
         FROM gh_sme_service.sme_notice n
                  LEFT JOIN gh_sme_service.sys_user u ON n.publisher_id = u.id AND u.del_flag = 0
+            -- 新增：关联字典项表（部门字典）
+                 LEFT JOIN gh_sme_service.sys_dict_item di ON u.dept_code = di.item_code AND di.dict_id = 10 AND di.del_flag = 0 AND di.status = 1
         WHERE n.id = #{id}
           AND n.del_flag = 0
     </select>
@@ -111,12 +122,11 @@
         AND del_flag = 0
     </update>
 
-
-
     <!-- 查询当前用户收到的通知列表 -->
     <select id="queryMyNotice" resultMap="SmeNoticeResultMap">
         SELECT p.id, p.title, p.notice_type, p.publisher_id,
                gy.real_name AS publisher_name,
+               di.item_name AS publisher_dept_name,
                p.content,
                p.publish_time, p.target_type, p.target_value,
                p.create_time, p.update_time,
@@ -125,9 +135,14 @@
         FROM gh_sme_service.sme_notice p
                  LEFT JOIN gh_sme_service.sme_notice_user nu ON p.id = nu.notice_id AND nu.user_id = #{userId}
                  LEFT JOIN gh_sme_service.sys_user gy ON p.publisher_id = gy.id AND gy.del_flag = 0
+                 LEFT JOIN gh_sme_service.sys_dict_item di ON gy.dept_code = di.item_code AND di.dict_id = 10 AND di.del_flag = 0 AND di.status = 1
         WHERE p.del_flag = 0
           AND nu.id IS NOT NULL
-        ORDER BY p.publish_time DESC
+        ORDER BY
+            -- 核心逻辑：未读(0)在前，已读(1)在后
+            nu.is_read ASC,
+            -- 次要逻辑：时间倒序，最新的在前面
+            p.publish_time DESC
     </select>
 
     <!-- 修正：查询当前用户发送的通知列表（适配实际表结构） -->
@@ -138,6 +153,8 @@
         p.notice_type,
         p.publisher_id,
         gy.real_name AS publisher_name,  <!-- 关联发布人姓名 -->
+        -- 新增：关联字典项表获取发布人部门名称
+        di.item_name AS publisher_dept_name,
         p.content,
         p.publish_time,
         p.target_type,
@@ -148,6 +165,8 @@
         FROM gh_sme_service.sme_notice p
         <!-- 关联用户表获取发布人姓名 -->
         LEFT JOIN gh_sme_service.sys_user gy ON p.publisher_id = gy.id AND gy.del_flag = 0
+        -- 新增：关联字典项表（部门字典）
+        LEFT JOIN gh_sme_service.sys_dict_item di ON gy.dept_code = di.item_code AND di.dict_id = 10 AND di.del_flag = 0 AND di.status = 1
         WHERE
         p.del_flag = 0  <!-- 修正：使用正确的逻辑删除字段del_flag -->
         AND p.publisher_id = #{publisherId}  <!-- 核心条件：发布人ID = 当前用户ID -->

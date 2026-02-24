@@ -84,5 +84,8 @@ public class SmeNotice implements Serializable {
      * 发布人姓名
      */
     private String publisherName;
+
+    // 新增：发布人所属部门名称
+    private String publisherDeptName;
 }
 

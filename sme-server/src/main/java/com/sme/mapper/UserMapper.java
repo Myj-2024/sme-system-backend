@@ -68,5 +68,9 @@ public interface UserMapper{
     int updateProfile(User user);
 
 
+    /**
+     * 重置用户密码
+     */
+    int resetPassword(User updateUser);
 }
 

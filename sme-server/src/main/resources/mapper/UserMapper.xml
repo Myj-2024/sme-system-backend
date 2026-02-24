@@ -211,4 +211,11 @@
         </set>
         WHERE id = #{id} AND del_flag = 0
     </update>
+    <update id="resetPassword">
+        UPDATE sys_user
+        SET password = #{password},
+            update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+          AND del_flag = 0
+    </update>
 </mapper>
