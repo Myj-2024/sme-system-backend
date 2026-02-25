@@ -5,6 +5,7 @@ import com.sme.entity.Dept;
 import com.sme.result.PageResult;
 import com.sme.result.Result;
 import com.sme.service.DeptService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/admin/dept")
-@Tag(name = "部门管理")
+@Tag(name = "部门管理", description = "部门管理接口")
 public class DeptController {
 
     @Autowired
@@ -23,12 +24,14 @@ public class DeptController {
 
     /** 列表 */
     @GetMapping("/list")
+    @Operation(summary = "部门列表")
     public Result<List<Dept>> list() {
         return Result.success(deptService.findAllDepts());
     }
 
     /** 分页 / 条件查询 */
     @GetMapping("/page")
+    @Operation(summary = "部门分页查询")
     public Result<PageResult> page(DeptPageQueryDTO deptPageQueryDTO) {
         log.info("分页查询参数：{}", deptPageQueryDTO);
         PageResult  page = deptService.page(deptPageQueryDTO);
@@ -38,18 +41,21 @@ public class DeptController {
 
     /** 详情 */
     @GetMapping("/{id}")
+    @Operation(summary = "部门详情")
     public Result<Dept> detail(@PathVariable Long id) {
         return Result.success(deptService.getById(id));
     }
 
     /** 新增 */
     @PostMapping
+    @Operation(summary = "部门新增")
     public Result<Void> add(@RequestBody Dept dept) {
         deptService.insertDept(dept);
         return Result.success();
     }
 
     /** 修改 */
+    @Operation(summary = "部门修改")
     @PutMapping
     public Result<Void> update(@RequestBody Dept dept) {
         deptService.updateDept(dept);
@@ -57,6 +63,7 @@ public class DeptController {
     }
 
     /** 删除（物理） */
+    @Operation(summary = "部门删除")
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         deptService.deleteDept(id);
@@ -65,6 +72,7 @@ public class DeptController {
 
     /** 修改部门状态 */
     @PutMapping("/{id}/status")
+    @Operation(summary = "部门状态修改")
     public Result<Void> changeStatus(
             @PathVariable Long id,
             @RequestParam Integer status

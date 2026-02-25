@@ -6,9 +6,7 @@ import com.sme.dto.SysDictDTO;
 import com.sme.entity.SysDict;
 import jakarta.validation.constraints.NotBlank;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
-import java.util.List;
 
 @Mapper
 public interface DictMapper {

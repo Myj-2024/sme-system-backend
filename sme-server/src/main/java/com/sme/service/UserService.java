@@ -3,10 +3,8 @@ package com.sme.service;
 import com.github.pagehelper.Page;
 import com.sme.dto.UserLoginDTO;
 import com.sme.dto.UserPageQueryDTO;
-import com.sme.entity.Role;
 import com.sme.entity.User;
 import com.sme.result.PageResult;
-import com.sme.result.Result;
 import com.sme.vo.PermissionVO;
 import com.sme.vo.UserLoginVO;
 

@@ -4,7 +4,6 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sme.dto.PermissionPageQueryDTO;
 import com.sme.entity.SysPermission;
-import com.sme.exception.BaseException;
 import com.sme.mapper.PermissionMapper;
 import com.sme.result.PageResult;
 import com.sme.result.Result;

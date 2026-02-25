@@ -5,7 +5,6 @@ import com.github.pagehelper.PageHelper;
 import com.sme.dto.DictPageQueryDTO;
 import com.sme.dto.SysDictDTO;
 import com.sme.entity.SysDict;
-import com.sme.entity.User;
 import com.sme.mapper.DictItemMapper;
 import com.sme.mapper.DictMapper;
 import com.sme.result.PageResult;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 
 @Service
 public class DictServiceImpl implements DictService {
@@ -28,6 +26,11 @@ public class DictServiceImpl implements DictService {
     private DictItemMapper dictItemMapper;
 
 
+    /**
+     * 查询字典列表
+     * @param dictPageQueryDTO
+     * @return
+     */
     @Override
     public PageResult selectDictList(DictPageQueryDTO dictPageQueryDTO) {
         PageHelper.startPage(dictPageQueryDTO.getPageNum(), dictPageQueryDTO.getPageSize());
@@ -36,11 +39,20 @@ public class DictServiceImpl implements DictService {
 
     }
 
+    /**
+     * 查询字典列表
+     * @return
+     */
     @Override
     public Result<?> selectDictAll() {
         return Result.success(dictMapper.selectDictAll());
     }
 
+    /**
+     * 根据ID查询字典
+     * @param id
+     * @return
+     */
     @Override
     public Result<?> selectDictById(Long id) {
         SysDict dict = dictMapper.selectById(id);
@@ -50,6 +62,11 @@ public class DictServiceImpl implements DictService {
         return Result.success(dict);
     }
 
+    /**
+     * 新增字典
+     * @param dictDTO
+     * @return
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<?> insertDict(SysDictDTO dictDTO) {
@@ -74,6 +91,11 @@ public class DictServiceImpl implements DictService {
         return Result.success("操作成功");
     }
 
+    /**
+     * 修改字典
+     * @param dictDTO
+     * @return
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<?> updateDict(SysDictDTO dictDTO) {
@@ -92,6 +114,12 @@ public class DictServiceImpl implements DictService {
         return Result.success("操作成功");
     }
 
+    /**
+     * 修改字典状态
+     * @param id
+     * @param status
+     * @return
+     */
     @Override
     public Result<?> updateDictStatus(Long id, Integer status) {
 
@@ -109,6 +137,11 @@ public class DictServiceImpl implements DictService {
         return Result.success("状态修改成功");
     }
 
+    /**
+     * 删除字典
+     * @param ids
+     * @return
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<?> deleteDictByIds(Long[] ids) {

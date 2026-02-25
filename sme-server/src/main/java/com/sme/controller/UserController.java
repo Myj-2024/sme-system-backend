@@ -3,7 +3,6 @@ package com.sme.controller;
 
 import com.sme.constant.MessageConstant;
 import com.sme.dto.UserPageQueryDTO;
-import com.sme.entity.Role;
 import com.sme.entity.User;
 import com.sme.exception.BaseException;
 import com.sme.result.PageResult;
@@ -181,6 +180,7 @@ public class UserController {
      * @return
      */
     @PutMapping("/{id}/role")
+    @Operation(summary = "修改用户角色", description = "仅更新角色字段")
     public Result updateRole(@PathVariable Long id, @RequestBody User user) {
         // 1. 基础参数校验
         Assert.notNull(id, "用户ID不能为空");
@@ -206,6 +206,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/resetPwd/{id}")
+    @Operation(summary = "重置密码", description = "返回重置结果")
     public Result resetPassword(@PathVariable Long id) {
         log.info("重置密码：{}", id);
         userService.resetPassword(id);

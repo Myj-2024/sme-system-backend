@@ -20,6 +20,11 @@ public class RoleServiceImpl implements RoleService {
     @Autowired
     private RoleMapper roleMapper;
 
+    /**
+     * 分页查询
+     * @param dto
+     * @return
+     */
     @Override
     public PageResult page(RolePageQueryDTO dto) {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
@@ -27,12 +32,21 @@ public class RoleServiceImpl implements RoleService {
         return new PageResult(page.getTotal(), page.getResult());
     }
 
+    /**
+     * 查询所有角色
+     * @return
+     */
     @Override
     public Result<List<Role>> selectAllRoles() {
         List<Role> roles = roleMapper.selectAllRoles();
         return Result.success(roles);
     }
 
+    /**
+     * 新增角色
+     * @param role
+     * @return
+     */
     @Override
     public Result<Void> add(Role role) {
         if (roleMapper.checkRoleCodeUnique(role.getRoleCode(), null) > 0) {
@@ -43,6 +57,11 @@ public class RoleServiceImpl implements RoleService {
     }
 
 
+    /**
+     * 修改角色
+     * @param role
+     * @return
+     */
     @Override
     public Result<Void> update(Role role) {
 
@@ -69,12 +88,22 @@ public class RoleServiceImpl implements RoleService {
     }
 
 
+    /**
+     * 根据ID查询角色
+     * @param id
+     * @return
+     */
     @Override
     public Result<Role> getById(Long id) {
         Role role = roleMapper.getRoleById(id);
         return Result.success(role);
     }
 
+    /**
+     * 删除角色
+     * @param id
+     * @return
+     */
     @Override
     public Result<Void> delete(Long id) {
         roleMapper.deleteRole(id);

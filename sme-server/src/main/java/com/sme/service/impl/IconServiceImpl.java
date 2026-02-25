@@ -2,7 +2,7 @@ package com.sme.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.sme.entity.Icon; // 关键：导入自己的Icon实体类
+import com.sme.entity.Icon;
 import com.sme.dto.IconPageQueryDTO;
 import com.sme.mapper.IconMapper;
 import com.sme.result.PageResult;
@@ -11,7 +11,6 @@ import com.sme.service.IconService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-// 移除错误的导入：javax.swing.Icon
 
 @Service
 public class IconServiceImpl implements IconService {
@@ -65,6 +64,11 @@ public class IconServiceImpl implements IconService {
         return Result.success(icon);
     }
 
+    /**
+     * 修改
+     * @param icon
+     * @return
+     */
     @Override
     public Result<Icon> update(Icon icon) {
         if (icon == null){
@@ -84,6 +88,11 @@ public class IconServiceImpl implements IconService {
         return Result.success(updatedIcon);
     }
 
+    /**
+     * 删除
+     * @param id
+     * @return
+     */
     @Override
     public Result<Void> delete(Long id) {
         int rows = iconMapper.delete(id); // 接收受影响行数

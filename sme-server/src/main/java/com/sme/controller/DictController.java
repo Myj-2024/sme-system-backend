@@ -1,18 +1,13 @@
 package com.sme.controller;
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.sme.constant.MessageConstant;
 import com.sme.dto.DictPageQueryDTO;
 import com.sme.dto.SysDictDTO;
-import com.sme.entity.SysDict;
 import com.sme.exception.BaseException;
 import com.sme.result.PageResult;
 import com.sme.result.Result;
 import com.sme.service.DictService;
-import com.sme.utils.PageUtils;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/admin/dict")
-@Tag(name = "字典管理接口")
+@Tag(name = "字典管理接口", description = "字典管理接口")
 @Slf4j
 public class DictController {
 

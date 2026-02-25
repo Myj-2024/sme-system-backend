@@ -6,7 +6,7 @@ import com.sme.entity.SmeNotice;
 import com.sme.result.PageResult;
 import com.sme.result.Result;
 import com.sme.service.SmeNoticeService;
-import com.sme.utils.UserContext; // 新增：引入项目统一的用户上下文工具类
+import com.sme.utils.UserContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/admin/notice")
 @Slf4j
-@Tag(name = "通知管理")
+@Tag(name = "通知管理", description = "通知管理接口")
 public class SmeNoticeController {
 
     @Autowired

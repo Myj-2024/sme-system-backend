@@ -39,6 +39,7 @@ public class SmePleController {
      * 根据id查询
      */
     @GetMapping("/{id}")
+    @Operation(summary = "根据id查询", description = "根据id查询")
     public Result<SmePLE> getPleById(@PathVariable Long id){
         SmePLE smePLE = smePleService.getPleById(id);
         if (smePLE != null){
@@ -52,6 +53,7 @@ public class SmePleController {
      * 新增包抓联
      */
     @PostMapping
+    @Operation(summary = "新增包抓联", description = "新增包抓联")
     public Result<SmePLE> insert(@RequestBody SmePLE smePLE){
         log.info("新增包抓联参数：{}", smePLE);
         Boolean insert = smePleService.insert(smePLE);
@@ -66,6 +68,7 @@ public class SmePleController {
      * 修改包抓联
      */
     @PutMapping
+    @Operation(summary = "修改包抓联", description = "修改包抓联")
     public Result<SmePLE> update(@RequestBody SmePLE smePLE){
         log.info("修改包抓联参数：{}", smePLE);
         Boolean update = smePleService.update(smePLE);
@@ -80,6 +83,7 @@ public class SmePleController {
      * 删除包抓联
      */
     @DeleteMapping("/{id}")
+    @Operation(summary = "删除包抓联", description = "删除包抓联")
     public Result<Void> delete(@PathVariable Long id){
         log.info("删除包抓联参数：{}", id);
         Boolean delete = smePleService.deleteById(id);

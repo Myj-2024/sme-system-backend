@@ -1,6 +1,5 @@
 package com.sme.service;
 
-import com.sme.dto.RoleDTO;
 import com.sme.dto.RolePageQueryDTO;
 import com.sme.entity.Role;
 import com.sme.result.PageResult;

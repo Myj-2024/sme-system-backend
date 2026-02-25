@@ -1,6 +1,5 @@
 package com.sme.controller;
 
-import com.sme.constant.MessageConstant;
 import com.sme.result.Result;
 import com.sme.utils.MinioUtil;
 import io.swagger.v3.oas.annotations.Operation;

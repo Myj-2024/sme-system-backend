@@ -1,13 +1,11 @@
 package com.sme.controller;
 
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.sme.dto.SysDictItemDTO;
 import com.sme.dto.SysDictItemPageQueryDTO;
 import com.sme.result.PageResult;
 import com.sme.result.Result;
 import com.sme.service.DictItemService;
-import com.sme.utils.PageUtils;
 import com.sme.vo.SysDictItemVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,7 +20,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/admin/dict/item")
-@Tag(name = "字典项管理接口")
+@Tag(name = "字典项管理接口", description = "字典项管理")
 public class DictItemController {
 
     @Autowired

@@ -11,12 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/admin/enterprise")
 @Slf4j
-@Tag(name = "企业管理接口")
+@Tag(name = "企业管理接口", description = "企业管理")
 public class EnterpriseController {
 
     @Autowired

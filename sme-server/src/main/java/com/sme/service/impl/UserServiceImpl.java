@@ -13,10 +13,8 @@ import com.sme.mapper.PermissionMapper;
 import com.sme.mapper.RoleMapper;
 import com.sme.mapper.UserMapper;
 import com.sme.result.PageResult;
-import com.sme.result.Result;
 import com.sme.service.UserService;
 import com.sme.utils.JwtUtil;
-import com.sme.utils.MenuTreeBuilder;
 import com.sme.utils.UserContext;
 import com.sme.vo.PermissionVO;
 import com.sme.vo.UserLoginVO;
@@ -53,22 +51,35 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // 以下原有方法完全保留，无任何修改
+
+    /**
+     * 查询所有用户
+     * @return
+     */
     @Override
     public List<User> findAll() {
         return userMapper.findAll();
     }
 
+    /**
+     * 根据ID查询用户
+     */
     @Override
     public User findById(Long id) {
         return userMapper.findById(id);
     }
 
+    /**
+     * 根据用户名查询用户
+     */
     @Override
     public User findByUserName(String username) {
         return userMapper.findByUserName(username);
     }
 
+    /**
+     * 新增用户
+     */
     @Override
     public Boolean insert(User user) {
         try {
@@ -87,6 +98,9 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * 修改用户
+     */
     @Override
     public Boolean update(User user) {
         try {
@@ -106,6 +120,9 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    /**
+     * 删除用户
+     */
     @Override
     public Boolean deleteById(Long id) {
         try {
@@ -122,6 +139,9 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * 修改用户状态
+     */
     @Override
     public void updateUserStatus(Integer status, Long id) {
         Long currentUserId = UserContext.getUserId();
@@ -136,6 +156,9 @@ public class UserServiceImpl implements UserService {
         userMapper.update(user);
     }
 
+    /**
+     * 分页查询
+     */
     @Override
     public PageResult pageQuery(UserPageQueryDTO userPageQueryDTO) {
         PageHelper.startPage(userPageQueryDTO.getPageNum(), userPageQueryDTO.getPageSize());
@@ -143,6 +166,9 @@ public class UserServiceImpl implements UserService {
         return new PageResult(page.getTotal(), page.getResult());
     }
 
+    /**
+     * 修改用户角色
+     */
     @Override
     public boolean updateRole(User user) {
         Role role = roleMapper.getRoleById(user.getRoleId());
@@ -190,6 +216,9 @@ public class UserServiceImpl implements UserService {
         log.info("用户ID:{} 密码重置成功，默认密码：123456", id);
     }
 
+    /**
+     * 修改密码
+     */
     @Override
     public Boolean updatePassword(User user) {
         try {
@@ -204,6 +233,9 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * 修改个人资料
+     */
     @Override
     public Boolean updateProfile(User user) {
         try {
@@ -216,6 +248,9 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * 登录
+     */
     @Override
     public UserLoginVO login(UserLoginDTO userLoginDTO) {
         log.info("用户登录请求：{}", userLoginDTO.getUsername());

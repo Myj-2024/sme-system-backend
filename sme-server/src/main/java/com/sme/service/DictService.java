@@ -2,10 +2,8 @@ package com.sme.service;
 
 import com.sme.dto.DictPageQueryDTO;
 import com.sme.dto.SysDictDTO;
-import com.sme.entity.SysDict;
 import com.sme.result.PageResult;
 import com.sme.result.Result;
-import java.util.List;
 
 
 public interface DictService {

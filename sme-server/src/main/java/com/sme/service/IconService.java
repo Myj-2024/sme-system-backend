@@ -3,7 +3,7 @@ package com.sme.service;
 import com.sme.dto.IconPageQueryDTO;
 import com.sme.result.PageResult;
 import com.sme.result.Result;
-import com.sme.entity.Icon; // 关键：导入自己的Icon实体类
+import com.sme.entity.Icon;
 
 
 public interface IconService {

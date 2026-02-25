@@ -4,7 +4,6 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sme.dto.EnterprisePageQueryDTO;
 import com.sme.entity.Enterprise;
-import com.sme.entity.User;
 import com.sme.mapper.EnterpriseMapper;
 import com.sme.result.PageResult;
 import com.sme.service.EnterpriseService;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class EnterpriseServiceImpl implements EnterpriseService {

@@ -2,10 +2,8 @@ package com.sme.mapper;
 
 import com.github.pagehelper.Page;
 import com.sme.dto.UserPageQueryDTO;
-import com.sme.entity.SysPermission;
 import com.sme.entity.User;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 

@@ -154,6 +154,12 @@ public class SmePackageContactServiceImpl implements SmePackageContactService {
     }
 
     // ========== 办理记录核心方法 ==========
+
+    /**
+     * 查询办理记录列表
+     * @param packageId 包抓联主表ID
+     * @return
+     */
     @Override
     public List<SmePackageHandleRecord> listHandleRecordByPackageId(Long packageId) {
         // 新增：空值校验，避免空指针
@@ -163,6 +169,10 @@ public class SmePackageContactServiceImpl implements SmePackageContactService {
         return handleRecordMapper.selectByPackageId(packageId);
     }
 
+    /**
+     * 新增办理记录
+     * @param handleRecord
+     */
     @Override
     public void addHandleRecord(SmePackageHandleRecord handleRecord) {
         // 新增：参数空值校验
@@ -179,6 +189,9 @@ public class SmePackageContactServiceImpl implements SmePackageContactService {
         handleRecordMapper.insert(handleRecord);
     }
 
+    /**
+     * 更新办理记录
+     */
     @Override
     public void updateHandleRecord(SmePackageHandleRecord handleRecord) {
         // 新增：参数空值校验
@@ -191,6 +204,9 @@ public class SmePackageContactServiceImpl implements SmePackageContactService {
         handleRecordMapper.updateById(handleRecord);
     }
 
+    /**
+     * 删除办理记录
+     */
     @Override
     public void deleteHandleRecord(Long id) {
         // 新增：参数空值校验
@@ -205,6 +221,14 @@ public class SmePackageContactServiceImpl implements SmePackageContactService {
     }
 
     // ========== 核心修改：更新问题办理状态（完全对齐前端） ==========
+
+    /**
+     * 更新问题办理状态
+     * @param id 包抓联主表ID
+     * @param processStatus 流程状态（UNHANDLED/HANDLING/COMPLETED/UNABLE）
+     * @param completeTime 办结时间（仅COMPLETED状态必填）
+     * @param unableReason 无法办理原因（仅UNABLE状态必填）
+     */
     @Override
     public void updateProcessStatus(Long id, String processStatus, String completeTime, String unableReason) {
         // 1. 参数校验
@@ -235,6 +259,12 @@ public class SmePackageContactServiceImpl implements SmePackageContactService {
     }
 
     // ========== 业务流程方法（适配前端状态） ==========
+
+    /**
+     *  受理问题
+     * @param packageId 包抓联主表ID
+     * @param acceptParams 受理参数（handleUser/investigationContent/attachUrl等）
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void acceptProblem(Long packageId, Map<String, Object> acceptParams) {
@@ -256,6 +286,11 @@ public class SmePackageContactServiceImpl implements SmePackageContactService {
         addHandleRecord(record);
     }
 
+    /**
+     *  办结问题
+     * @param packageId 包抓联主表ID
+     * @param completeParams 办结参数（completeTime/completeContent/attachUrl等）
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void completeProblem(Long packageId, Map<String, Object> completeParams) {
@@ -282,6 +317,11 @@ public class SmePackageContactServiceImpl implements SmePackageContactService {
         addHandleRecord(record);
     }
 
+    /**
+     *  暂无法办结问题
+     * @param packageId 包抓联主表ID
+     * @param unableParams 无法办结参数（unableReason/attachUrl等）
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void unableProblem(Long packageId, Map<String, Object> unableParams) {

@@ -1,6 +1,5 @@
 package com.sme.service;
 
-import org.springframework.stereotype.Service;
 
 /**
  * 通知-用户关联服务接口

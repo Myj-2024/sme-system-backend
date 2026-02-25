@@ -4,7 +4,6 @@ import com.sme.dto.EnterprisePageQueryDTO;
 import com.sme.entity.Enterprise;
 import com.sme.result.PageResult;
 
-import java.util.List;
 
 public interface EnterpriseService {
 

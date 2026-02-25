@@ -19,7 +19,7 @@ import java.util.Map;
 @RestController
 @Slf4j
 @RequestMapping("admin/smePackageContact")
-@Tag(name = "包抓联管理")
+@Tag(name = "包抓联管理", description = "包抓联管理")
 public class SmePackageContactController {
 
     @Autowired

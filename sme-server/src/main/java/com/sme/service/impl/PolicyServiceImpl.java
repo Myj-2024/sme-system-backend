@@ -7,7 +7,6 @@ import com.sme.dto.PolicyPageQueryDTO;
 import com.sme.entity.Policy;
 import com.sme.mapper.PolicyMapper;
 import com.sme.result.PageResult;
-import com.sme.result.Result;
 import com.sme.service.PolicyService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
