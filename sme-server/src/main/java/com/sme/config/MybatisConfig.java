@@ -37,8 +37,8 @@ public class MybatisConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/admin/auth/login",       // 登录接口
                         "/admin/enterprise/show/list",  // 企业风采分页接口
-                        "/admin/policy/page",      // 【新增】政策通告分页接口，供前台匿名访问
-                        "/admin/dict/item/**",     // 【新增】如果前台需要加载字典项，也需放行
+                        "/admin/policy/page",      // 政策通告分页接口
+                        "/admin/dict/item/**",     // 加载字典项
                         "/swagger-ui/**",          // Swagger 文档
                         "/v3/api-docs/**",         // API 文档
                         "/favicon.ico",

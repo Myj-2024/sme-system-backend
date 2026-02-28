@@ -34,7 +34,7 @@ public class SecurityConfig {
 
 
                         // 放行 Swagger 文档接口（如果需要）
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/readme.html").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/中小企业服务系统数据库文档.html").permitAll()
                         // 其他所有请求都允许（实际认证由 JWT 拦截器处理）
                         .anyRequest().permitAll()
                 );
