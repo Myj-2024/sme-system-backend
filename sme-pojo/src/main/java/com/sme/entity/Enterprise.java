@@ -20,6 +20,8 @@ public class Enterprise {
     private String industryId;  // 所属行业
     private String mainProduct; // 主要产品
     private String businessStatus;  // 经营状态
+    private String enterpriseIntro;
+    private Integer isShow;
     private Date createTime;  // 创建时间
     private Date updateTime;  // 更新时间
     private Integer delFlag;  // 逻辑删除标记

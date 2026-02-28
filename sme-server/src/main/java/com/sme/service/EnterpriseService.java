@@ -44,4 +44,11 @@ public interface EnterpriseService {
      * @param status
      */
     void updateStatus(Long id, Integer status);
+
+    /**
+     * 置顶
+     * @param id
+     * @param isShow
+     */
+    boolean isShow(Long id, Integer isShow);
 }

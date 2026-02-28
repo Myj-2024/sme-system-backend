@@ -19,6 +19,8 @@ public class EnterpriseDTO {
     private String townId;  // 所属乡镇
     private String industryId;  // 所属行业
     private String businessStatus;  // 经营状态
+    private String enterpriseIntro;
+    private Integer isShow;
     private Date createTime;  // 创建时间
     private Date updateTime;  // 更新时间
     private Integer delFlag;  // 逻辑删除标记

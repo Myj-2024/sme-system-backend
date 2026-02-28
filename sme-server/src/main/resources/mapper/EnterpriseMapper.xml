@@ -28,6 +28,10 @@
         <result column="business_status" property="businessStatus" />
 <!--        主要产品-->
         <result column="main_product" property="mainProduct" />
+<!--        企业简介-->
+        <result column="enterprise_intro" property="enterpriseIntro" />
+        <result column="is_show" property="isShow" />
+
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="del_flag" property="delFlag" />
@@ -48,6 +52,8 @@
             industry_id,
             business_status,
             main_product,
+            enterprise_intro,
+            is_show,
             del_flag
         ) VALUES (
             #{enterpriseName},
@@ -62,6 +68,8 @@
             #{industryId},
             #{businessStatus},
             #{mainProduct},
+            #{enterpriseIntro},
+            #{isShow},
             0
         )
     </insert>
@@ -106,6 +114,12 @@
             <if test="mainProduct != null">
                 main_product = #{mainProduct},
             </if>
+            <if test="enterpriseIntro != null">
+                enterprise_intro = #{enterpriseIntro},
+            </if>
+            <if test="isShow != null">
+                is_show = #{isShow},
+            </if>
             update_time = now(),
         </set>
         WHERE id = #{id}
@@ -116,6 +130,13 @@
         UPDATE sme_enterprise
         SET business_status = #{status}
         WHERE id = #{id}
+    </update>
+
+    <update id="isShow">
+        update sme_enterprise  <!-- 补充库名，和其他SQL保持一致 -->
+        set is_show = #{isShow},
+        del_flag = 0  <!-- 显示时恢复逻辑未删除状态 -->
+        where id = #{id}
     </update>
     <!--    删除 企业（单个）-->
     <delete id="deleteById">
@@ -139,7 +160,7 @@
         id, enterprise_name, credit_code, enterprise_type,
         phone, business_addr, legal_person, reg_capital,
         establish_time, town_id, industry_id,
-        business_status, create_time, update_time,main_product,del_flag
+        business_status, create_time, update_time,main_product,enterprise_intro, is_show,del_flag
         FROM sme_enterprise
         WHERE del_flag = 0
         <if test="enterpriseName != null and enterpriseName != ''">
@@ -166,7 +187,7 @@
         id, enterprise_name, credit_code, enterprise_type,
         phone, business_addr, legal_person, reg_capital,
         establish_time, town_id, industry_id,
-        business_status, create_time, update_time,main_product, del_flag
+        business_status, create_time, update_time,main_product,enterprise_intro, is_show, del_flag
         FROM sme_enterprise
         WHERE id = #{id}
     </select>

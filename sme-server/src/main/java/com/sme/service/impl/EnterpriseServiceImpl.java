@@ -76,4 +76,15 @@ public class EnterpriseServiceImpl implements EnterpriseService {
     public void updateStatus(Long id, Integer status) {
         enterpriseMapper.updateStatus(id, status);
     }
+
+    /**
+     * 是否显示
+     * @param id
+     * @param isShow
+     * @return
+     */
+    @Override
+    public boolean isShow(Long id, Integer isShow) {
+        return enterpriseMapper.isShow(id, isShow) > 0;
+    }
 }

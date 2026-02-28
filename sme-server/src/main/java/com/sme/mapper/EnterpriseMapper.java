@@ -65,4 +65,11 @@ public interface EnterpriseMapper {
      * @return
      */
     Page<Enterprise> selectPage(EnterprisePageQueryDTO enterprisePageQueryDTO);
+
+    /**
+     * 是否显示
+     * @param id
+     * @param isShow
+     */
+    int isShow(Long id, Integer isShow);
 }

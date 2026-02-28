@@ -30,4 +30,9 @@ public class EnterprisePageQueryDTO implements Serializable {
     private String businessStatus;
 
     private String mainProduct;
+
+    private String enterpriseIntro;
+
+    private Integer isShow;
+
 }

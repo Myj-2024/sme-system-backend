@@ -17,25 +17,32 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class MybatisConfig implements WebMvcConfigurer {
 
     private static final Logger log = LoggerFactory.getLogger(MybatisConfig.class);
+
     @Autowired
     private JwtInterceptor jwtInterceptor;
 
-
-
-
     /**
-     * 添加 JWT 拦截器
-     * @param registry
+     * 添加 JWT 拦截器并配置放行路径
+     * @param registry 拦截器注册器
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        log.info("正在注册 JWT 拦截器并配置放行路径...");
+
         // 添加 JWT 拦截器
         registry.addInterceptor(jwtInterceptor)
-                // 拦截所有请求路径
+                // 拦截所有以 /admin/ 开头的后台管理接口
                 .addPathPatterns("/admin/**")
-                // 排除登录接口
-                .excludePathPatterns("/admin/auth/login");
-
+                // 排除不需要 Token 认证的接口（白名单）
+                .excludePathPatterns(
+                        "/admin/auth/login",       // 登录接口
+                        "/admin/enterprise/page",  // 企业风采分页接口
+                        "/admin/policy/page",      // 【新增】政策通告分页接口，供前台匿名访问
+                        "/admin/dict/item/**",     // 【新增】如果前台需要加载字典项，也需放行
+                        "/swagger-ui/**",          // Swagger 文档
+                        "/v3/api-docs/**",         // API 文档
+                        "/favicon.ico",
+                        "/error"
+                );
     }
-
 }

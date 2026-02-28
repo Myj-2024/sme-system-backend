@@ -1,6 +1,7 @@
 package com.sme.controller;
 
 import com.sme.dto.EnterprisePageQueryDTO;
+import com.sme.dto.PolicyDTO;
 import com.sme.entity.Enterprise;
 import com.sme.result.PageResult;
 import com.sme.result.Result;
@@ -86,6 +87,20 @@ public class EnterpriseController {
             @RequestParam Integer status
     ){
         enterpriseService.updateStatus(id, status);
+        return Result.success();
+    }
+
+    /**
+     * 是否显示
+     */
+    @PutMapping("/{id}/show/{isShow}")
+    @Operation(summary = "是否显示")
+    public Result<Void> show(@PathVariable Long  id,@PathVariable Integer isShow){
+        log.info("显示：{},{}", id, isShow);
+        boolean result = enterpriseService.isShow(id, isShow);
+        if (!result) {
+            return Result.error("显示失败");
+        }
         return Result.success();
     }
 }
