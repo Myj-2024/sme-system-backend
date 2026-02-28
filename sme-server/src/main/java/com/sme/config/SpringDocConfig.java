@@ -45,12 +45,12 @@ public class SpringDocConfig {
     private Info getApiInfo() {
         return new Info()
                 // 文档标题
-                .title("广河中小微企业服务系统API文档")
+                .title("中小微企业服务系统API文档")
                 // 文档描述
-                .description("广河中小微企业服务系统核心接口")
+                .description("中小微企业服务系统核心接口")
                 // 联系人信息
                 .contact(new Contact()
-                        .name("马宇杰")
+                        .name("Myj&&Colour")
                         .email("3287456080@qq.com")
                         .url("https://ycdoc.de5.net"))
                 // 服务条款（可选）
@@ -67,6 +67,6 @@ public class SpringDocConfig {
     private ExternalDocumentation getExternalDocs() {
         return new ExternalDocumentation()
                 .description("数据库设计文档")
-                .url("http://localhost:8080/readme.html");
+                .url("http://localhost:8080/中小企业服务系统数据库文档.html");
     }
 }
