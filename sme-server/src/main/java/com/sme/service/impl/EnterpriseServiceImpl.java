@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class EnterpriseServiceImpl implements EnterpriseService {
@@ -86,5 +87,10 @@ public class EnterpriseServiceImpl implements EnterpriseService {
     @Override
     public boolean isShow(Long id, Integer isShow) {
         return enterpriseMapper.isShow(id, isShow) > 0;
+    }
+
+    @Override
+    public List<Enterprise> getShowList() {
+        return enterpriseMapper.getShowList();
     }
 }

@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/admin/enterprise")
@@ -102,6 +104,16 @@ public class EnterpriseController {
             return Result.error("显示失败");
         }
         return Result.success();
+    }
+
+    /**
+     * 查询所有已显示的企业列表
+     */
+    @GetMapping("/show/list")
+    @Operation(summary = "查询所有已显示的企业列表")
+    public Result<List<Enterprise>> getShowList() {
+        List<Enterprise> list = enterpriseService.getShowList();
+        return Result.success(list);
     }
 }
 

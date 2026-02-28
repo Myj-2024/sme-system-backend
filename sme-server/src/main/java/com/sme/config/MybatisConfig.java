@@ -36,7 +36,7 @@ public class MybatisConfig implements WebMvcConfigurer {
                 // 排除不需要 Token 认证的接口（白名单）
                 .excludePathPatterns(
                         "/admin/auth/login",       // 登录接口
-                        "/admin/enterprise/page",  // 企业风采分页接口
+                        "/admin/enterprise/show/list",  // 企业风采分页接口
                         "/admin/policy/page",      // 【新增】政策通告分页接口，供前台匿名访问
                         "/admin/dict/item/**",     // 【新增】如果前台需要加载字典项，也需放行
                         "/swagger-ui/**",          // Swagger 文档

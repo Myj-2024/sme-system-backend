@@ -191,5 +191,17 @@
         FROM sme_enterprise
         WHERE id = #{id}
     </select>
+<!--    查询所有已显示的企业列表-->
+    <select id="getShowList" resultType="com.sme.entity.Enterprise">
+        SELECT
+        id, enterprise_name, credit_code, enterprise_type,
+        phone, business_addr, legal_person, reg_capital,
+        establish_time, town_id, industry_id,
+        business_status, create_time, update_time,main_product,enterprise_intro, is_show, del_flag
+        FROM sme_enterprise
+        WHERE del_flag = 0
+        AND is_show = 1
+        ORDER BY create_time DESC
+    </select>
 
 </mapper>

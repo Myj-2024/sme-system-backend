@@ -4,6 +4,8 @@ import com.sme.dto.EnterprisePageQueryDTO;
 import com.sme.entity.Enterprise;
 import com.sme.result.PageResult;
 
+import java.util.List;
+
 
 public interface EnterpriseService {
 
@@ -51,4 +53,9 @@ public interface EnterpriseService {
      * @param isShow
      */
     boolean isShow(Long id, Integer isShow);
+
+    /**
+     * 显示
+     */
+    List<Enterprise> getShowList();
 }

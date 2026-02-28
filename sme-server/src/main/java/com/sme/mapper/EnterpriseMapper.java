@@ -72,4 +72,10 @@ public interface EnterpriseMapper {
      * @param isShow
      */
     int isShow(Long id, Integer isShow);
+
+    /**
+     * 获取显示列表
+     * @return
+     */
+    List<Enterprise> getShowList();
 }
