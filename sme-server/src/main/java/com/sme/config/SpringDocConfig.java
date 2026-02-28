@@ -32,8 +32,8 @@ public class SpringDocConfig {
                 .info(getApiInfo())
                 // 3. 配置多环境服务器
                 .servers(List.of(
-                        new Server().url("http://localhost:8080").description("开发环境服务器"),
-                        new Server().url("https://test.sme.com").description("测试环境服务器")
+                        new Server().url("http://localhost:8080").description("开发环境服务器")
+//                        new Server().url("https://test.sme.com").description("测试环境服务器")
                 ))
                 // 4. 配置外部文档
                 .externalDocs(getExternalDocs());
@@ -52,9 +52,9 @@ public class SpringDocConfig {
                 .contact(new Contact()
                         .name("马宇杰")
                         .email("3287456080@qq.com")
-                        .url("https://www.sme.com"))
+                        .url("https://ycdoc.de5.net"))
                 // 服务条款（可选）
-                .termsOfService("https://www.sme.com/terms")
+//                .termsOfService("https://www.sme.com/terms")
                 // 开源协议（可选，如Apache2.0）
                 .license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0.html"))
                 // 接口版本
