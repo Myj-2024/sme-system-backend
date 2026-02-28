@@ -1,3 +1,5 @@
+[前端仓库](https://github.com/Myj-2024/sme-system-frontend)
+
 ## 项目简介
 
 基于 Spring Boot 3.x 构建的中小企业管理系统后端服务，提供数据持久化、接口认证、文件存储、分页等核心能力，适配 MySQL 数据库与 MinIO 对象存储。
